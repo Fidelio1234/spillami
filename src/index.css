@@ -1,0 +1,155 @@
+/* ============================================
+   SPILLAMI — Design System
+   Palette: crema, terracotta, verde salvia, carta
+   Font: Playfair Display (display) + DM Sans (body)
+   ============================================ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* Brand Colors */
+  --cream:        #F8F4ED;
+  --cream-dark:   #EDE7DA;
+  --paper:        #FDFAF5;
+  --terracotta:   #C86B3C;
+  --terra-light:  #E8926A;
+  --terra-dark:   #A04E25;
+  --sage:         #7A9E7E;
+  --sage-light:   #A8C4AB;
+  --sage-dark:    #4F7A53;
+  --ink:          #1E1C18;
+  --ink-muted:    #6B6660;
+  --ink-faint:    #A09890;
+
+  /* Semantic */
+  --border:       rgba(30,28,24,0.10);
+  --border-hover: rgba(30,28,24,0.22);
+  --shadow-sm:    0 2px 12px rgba(30,28,24,0.06);
+  --shadow-md:    0 8px 32px rgba(30,28,24,0.10);
+  --shadow-lg:    0 16px 48px rgba(30,28,24,0.14);
+
+  /* Typography */
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body:    'DM Sans', system-ui, -apple-system, sans-serif;
+
+  /* Layout */
+  --max-width: 1200px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+  --radius-full: 999px;
+
+  /* Transitions */
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur: 200ms;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--cream);
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+/* ---- Scrollbar ---- */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--cream-dark); }
+::-webkit-scrollbar-thumb { background: var(--ink-faint); border-radius: 3px; }
+
+/* ---- Typography ---- */
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  line-height: 1.15;
+  font-weight: 500;
+}
+
+a { color: inherit; text-decoration: none; }
+
+button {
+  font-family: var(--font-body);
+  cursor: pointer;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* ---- Utility ---- */
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+}
+
+/* ---- Page fade in ---- */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.fade-up {
+  animation: fadeUp 0.5s var(--ease) both;
+}
+
+/* ---- Buttons global ---- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 26px;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid transparent;
+  transition: background var(--dur) var(--ease),
+              color var(--dur) var(--ease),
+              border-color var(--dur) var(--ease),
+              transform 80ms;
+}
+.btn:active { transform: scale(0.97); }
+
+.btn-dark {
+  background: var(--ink);
+  color: var(--cream);
+  border-color: var(--ink);
+}
+.btn-dark:hover {
+  background: var(--terra-dark);
+  border-color: var(--terra-dark);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--border-hover);
+}
+.btn-outline:hover {
+  border-color: var(--ink);
+}
+
+.btn-terra {
+  background: var(--terracotta);
+  color: white;
+  border-color: var(--terracotta);
+}
+.btn-terra:hover {
+  background: var(--terra-dark);
+  border-color: var(--terra-dark);
+}
