@@ -158,7 +158,7 @@ function MaintenancePage() {
           border: '0.5px solid rgba(30,28,24,0.15)',
           padding: '6px 18px',
           borderRadius: '999px',
-        }}>Apertura imminente</span>
+        }}>PROSSIMA APERTURA</span>
       </div>
     </div>
   )
