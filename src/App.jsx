@@ -11,6 +11,7 @@ import ShopPage from './pages/ShopPage'
 import ProductPage from './pages/ProductPage'
 import LoginPage from './pages/LoginPage'
 import AccountPage from './pages/AccountPage'
+import ResetPasswordPage from './pages/ResetPasswordPage'
 import CheckoutPage from './pages/CheckoutPage'
 import OrderSuccessPage from './pages/OrderSuccessPage'
 
@@ -46,6 +47,7 @@ export default function App() {
         <Route path="/product/:id" element={<ProductPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/account" element={<AccountPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/order-success" element={<OrderSuccessPage />} />
 
