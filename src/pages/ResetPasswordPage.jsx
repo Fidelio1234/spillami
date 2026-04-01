@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import styles from './LoginPage.module.css'
 
@@ -9,17 +9,28 @@ export default function ResetPasswordPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+  const [ready, setReady] = useState(false)
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
 
   useEffect(() => {
-    // Supabase gestisce il token dall'URL automaticamente
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'PASSWORD_RECOVERY') {
-        // Utente autenticato con il token di recovery — possiamo mostrare il form
-      }
-    })
-    return () => subscription.unsubscribe()
-  }, [])
+    // Leggi il token dall'URL e verifica la sessione
+    const tokenHash = searchParams.get('token_hash')
+    const type = searchParams.get('type')
+
+    if (tokenHash && type === 'recovery') {
+      supabase.auth.verifyOtp({ token_hash: tokenHash, type: 'recovery' })
+        .then(({ error }) => {
+          if (error) {
+            setError('Link non valido o scaduto. Richiedi un nuovo reset.')
+          } else {
+            setReady(true)
+          }
+        })
+    } else {
+      setError('Link non valido. Richiedi un nuovo reset dalla pagina di login.')
+    }
+  }, [searchParams])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -53,9 +64,9 @@ export default function ResetPasswordPage() {
     return (
       <main className={styles.page}>
         <div className={styles.card}>
-          <Link to="/" className={styles.logo}>
+          <a href="/" className={styles.logo}>
             <img src="/logo.jpg" alt="Spillami" style={{ height: '40px', width: 'auto', objectFit: 'contain' }} />
-          </Link>
+          </a>
           <div style={{ textAlign: 'center', padding: '1rem 0' }}>
             <div style={{ fontSize: '40px', marginBottom: '1rem' }}>✅</div>
             <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '22px', marginBottom: '8px' }}>
@@ -83,44 +94,60 @@ export default function ResetPasswordPage() {
           </button>
         </div>
 
-        <form className={styles.form} onSubmit={handleSubmit} noValidate>
-          <div className={styles.field}>
-            <label className={styles.label} htmlFor="password">Nuova password</label>
-            <input
-              id="password"
-              type="password"
-              className={styles.input}
-              placeholder="Minimo 6 caratteri"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={6}
-            />
+        {!ready && !error && (
+          <p style={{ textAlign: 'center', color: 'var(--ink-muted)', fontSize: '14px', padding: '1rem 0' }}>
+            Verifica del link in corso...
+          </p>
+        )}
+
+        {error && (
+          <div style={{ marginTop: '1rem' }}>
+            <p className={styles.error}>{error}</p>
+            <a href="/login" className="btn btn-outline" style={{ display: 'block', textAlign: 'center', marginTop: '1rem' }}>
+              Torna al login
+            </a>
           </div>
+        )}
 
-          <div className={styles.field}>
-            <label className={styles.label} htmlFor="confirm">Conferma password</label>
-            <input
-              id="confirm"
-              type="password"
-              className={styles.input}
-              placeholder="Ripeti la password"
-              value={confirm}
-              onChange={(e) => setConfirm(e.target.value)}
-              required
-            />
-          </div>
+        {ready && (
+          <form className={styles.form} onSubmit={handleSubmit} noValidate>
+            <div className={styles.field}>
+              <label className={styles.label} htmlFor="password">Nuova password</label>
+              <input
+                id="password"
+                type="password"
+                className={styles.input}
+                placeholder="Minimo 6 caratteri"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                minLength={6}
+                autoFocus
+              />
+            </div>
 
-          {error && <p className={styles.error}>{error}</p>}
+            <div className={styles.field}>
+              <label className={styles.label} htmlFor="confirm">Conferma password</label>
+              <input
+                id="confirm"
+                type="password"
+                className={styles.input}
+                placeholder="Ripeti la password"
+                value={confirm}
+                onChange={(e) => setConfirm(e.target.value)}
+                required
+              />
+            </div>
 
-          <button
-            type="submit"
-            className={`btn btn-terra ${styles.submitBtn}`}
-            disabled={loading}
-          >
-            {loading ? 'Salvataggio...' : 'Imposta nuova password'}
-          </button>
-        </form>
+            <button
+              type="submit"
+              className={`btn btn-terra ${styles.submitBtn}`}
+              disabled={loading}
+            >
+              {loading ? 'Salvataggio...' : 'Imposta nuova password'}
+            </button>
+          </form>
+        )}
       </div>
     </main>
   )
