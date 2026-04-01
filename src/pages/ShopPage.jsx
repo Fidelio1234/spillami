@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { useCartStore } from '../store/cartStore'
 import { useProducts } from '../hooks/useProducts'
-import { CATEGORIES } from '../data/products'
+import { useCategories } from '../hooks/useCategories'
 import styles from './ShopPage.module.css'
 
 const fmt = (n) =>
@@ -32,6 +32,13 @@ export default function ShopPage() {
 
   // Carica TUTTI i prodotti una volta sola
   const { products: allProducts, loading, error } = useProducts({ sortBy })
+  const { categories: dbCategories } = useCategories()
+
+  // Aggiunge "Tutti" in cima alle categorie dinamiche
+  const CATEGORIES = useMemo(() => [
+    { id: 'tutti', label: 'Tutti' },
+    ...dbCategories.map((c) => ({ id: c.slug, label: c.name }))
+  ], [dbCategories])
 
   // Filtra in locale — niente doppio fetch
   const products = useMemo(() => {
