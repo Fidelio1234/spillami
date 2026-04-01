@@ -35,9 +35,7 @@ export default function Navbar({ onCartOpen }) {
           <li><NavLink to="/shop?cat=cani" className={({ isActive }) => isActive ? styles.active : ''}>Cani</NavLink></li>
           <li><NavLink to="/shop?cat=gatti" className={({ isActive }) => isActive ? styles.active : ''}>Gatti</NavLink></li>
           <li><NavLink to="/shop?cat=collezione" className={({ isActive }) => isActive ? styles.active : ''}>Collezioni</NavLink></li>
-          {isAdmin && (
-            <li><NavLink to="/admin" className={({ isActive }) => isActive ? styles.adminLink : styles.adminLinkInactive}>Admin</NavLink></li>
-          )}
+          
         </ul>
 
         {/* Destra */}
