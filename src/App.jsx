@@ -146,8 +146,7 @@ function MaintenancePage() {
         </h1>
         <div style={{ width: '48px', height: '1.5px', background: '#C86B3C', margin: '0 auto 1.5rem', borderRadius: '2px' }} />
         <p style={{ fontSize: '16px', lineHeight: '1.8', color: '#6B6660', marginBottom: '2rem' }}>
-          Spillami sta per aprire le porte.<br />
-          Spille artigianali e accessori per chi ama gli animali.<br />
+         <br />
           Torna presto!
         </p>
         <span style={{
