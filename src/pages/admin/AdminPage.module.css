@@ -458,58 +458,6 @@
   border-radius: 0 0 var(--radius-sm) var(--radius-sm);
 }
 
-.categoriesSection {
-  margin-top: 2rem;
-  padding: 1.5rem;
-  background: var(--paper);
-  border: 0.5px solid var(--border);
-  border-radius: var(--radius-lg);
-}
-
-.catSectionTitle {
-  font-family: var(--font-display);
-  font-size: 18px;
-  font-weight: 500;
-  margin-bottom: 1.25rem;
-}
-
-.catForm {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 1rem;
-}
-
-.catList {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 1rem;
-}
-
-.catChip {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 12px;
-  background: var(--cream-dark);
-  border: 0.5px solid var(--border);
-  border-radius: var(--radius-full);
-  font-size: 13px;
-  color: var(--ink);
-}
-
-.catDelete {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--ink-faint);
-  font-size: 12px;
-  line-height: 1;
-  padding: 0;
-  transition: color 150ms;
-}
-.catDelete:hover { color: #c0392b; }
-
 /* ── RESPONSIVE ───────────────────── */
 @media (max-width: 1024px) {
   .statsGrid { grid-template-columns: repeat(2, 1fr); }

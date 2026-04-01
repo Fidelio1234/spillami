@@ -1,84 +1,12 @@
 import { useState, useRef } from 'react'
 import { Routes, Route, Link, NavLink, useNavigate, useParams } from 'react-router-dom'
 import { useAdminProducts, productService } from '../../hooks/useProducts'
-import { useCategories, categoryService } from '../../hooks/useCategories'
 import styles from './AdminPage.module.css'
 
 const fmt = (n) =>
   new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(n)
 
-// ── Gestione Categorie ────────────────────────────────────
-function CategoriesManager() {
-  const { categories, loading, refetch } = useCategories()
-  const [newCat, setNewCat] = useState('')
-  const [saving, setSaving] = useState(false)
-  const [error, setError] = useState('')
-
-  const handleAdd = async (e) => {
-    e.preventDefault()
-    if (!newCat.trim()) return
-    setSaving(true)
-    setError('')
-    try {
-      await categoryService.create(newCat)
-      setNewCat('')
-      await refetch()
-    } catch (err) {
-      setError(err.message)
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  const handleDelete = async (id, name) => {
-    if (!window.confirm(`Eliminare la categoria "${name}"?`)) return
-    try {
-      await categoryService.delete(id)
-      await refetch()
-    } catch (err) {
-      setError(err.message)
-    }
-  }
-
-  return (
-    <div className={styles.categoriesSection}>
-      <h3 className={styles.catSectionTitle}>Gestisci categorie</h3>
-
-      <form className={styles.catForm} onSubmit={handleAdd}>
-        <input
-          className={styles.input}
-          type="text"
-          value={newCat}
-          onChange={(e) => setNewCat(e.target.value)}
-          placeholder="Es. Tartarughe, Pesci..."
-          style={{ flex: 1 }}
-        />
-        <button type="submit" className="btn btn-terra" disabled={saving || !newCat.trim()}>
-          {saving ? '...' : '+ Aggiungi'}
-        </button>
-      </form>
-
-      {error && <p className={styles.errorMsg}>{error}</p>}
-
-      <div className={styles.catList}>
-        {loading ? (
-          <p style={{ fontSize: '13px', color: 'var(--ink-faint)' }}>Caricamento...</p>
-        ) : categories.map((cat) => (
-          <div key={cat.id} className={styles.catChip}>
-            <span>{cat.name}</span>
-            <button
-              className={styles.catDelete}
-              onClick={() => handleDelete(cat.id, cat.name)}
-              title="Elimina categoria"
-            >✕</button>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-
+// ── Dashboard ─────────────────────────────────────────────
 function AdminDashboard() {
   const { products, loading } = useAdminProducts()
 
@@ -109,8 +37,6 @@ function AdminDashboard() {
         <Link to="/admin/products" className="btn btn-dark">Gestisci prodotti →</Link>
         <Link to="/admin/products/new" className="btn btn-terra">+ Nuovo prodotto</Link>
       </div>
-
-      <CategoriesManager />
     </div>
   )
 }
@@ -217,7 +143,6 @@ function ProductForm() {
   const fileInputRef = useRef()
 
   const { products } = useAdminProducts()
-  const { categories } = useCategories()
   const existing = !isNew ? products.find((p) => p.id === id) : null
 
   const [form, setForm] = useState({
@@ -351,10 +276,11 @@ function ProductForm() {
               <div className={styles.field}>
                 <label className={styles.label}>Categoria</label>
                 <select className={styles.select} value={form.category} onChange={(e) => set('category', e.target.value)}>
-                  <option value="">Seleziona categoria...</option>
-                  {categories.map((cat) => (
-                    <option key={cat.id} value={cat.slug}>{cat.name}</option>
-                  ))}
+                  <option value="cani">Cani</option>
+                  <option value="gatti">Gatti</option>
+                  <option value="uccelli">Uccelli</option>
+                  <option value="conigli">Conigli</option>
+                  <option value="collezione">Collezione speciale</option>
                 </select>
               </div>
               <div className={styles.field}>

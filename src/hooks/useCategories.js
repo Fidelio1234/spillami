@@ -21,10 +21,7 @@ export function useCategories() {
 
 export const categoryService = {
   async create(name) {
-    const slug = name.toLowerCase()
-      .trim()
-      .replace(/\s+/g, '-')
-      .replace(/[^a-z0-9-]/g, '')
+    const slug = name.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
     const { data, error } = await supabase
       .from('categories')
       .insert([{ name: name.trim(), slug }])
@@ -33,12 +30,8 @@ export const categoryService = {
     if (error) throw error
     return data
   },
-
   async delete(id) {
-    const { error } = await supabase
-      .from('categories')
-      .delete()
-      .eq('id', id)
+    const { error } = await supabase.from('categories').delete().eq('id', id)
     if (error) throw error
   }
 }
