@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { useCartStore } from '../store/cartStore'
 import { useProducts } from '../hooks/useProducts'
-import { CATEGORIES } from '../data/products'
+import { useCategories } from '../hooks/useCategories'
 import styles from './ShopPage.module.css'
 
 const fmt = (n) =>
@@ -30,17 +30,19 @@ export default function ShopPage() {
 
   const activeCategory = searchParams.get('cat') || 'tutti'
 
-  // Carica TUTTI i prodotti una volta sola
   const { products: allProducts, loading, error } = useProducts({ sortBy })
+  const { categories: dbCategories } = useCategories()
 
-  // Filtra in locale — niente doppio fetch
+  const CATEGORIES = useMemo(() => [
+    { id: 'tutti', label: 'Tutti' },
+    ...dbCategories.map((c) => ({ id: c.slug, label: c.name }))
+  ], [dbCategories])
+
   const products = useMemo(() => {
     let list = allProducts
-
     if (activeCategory !== 'tutti') {
       list = list.filter((p) => p.category === activeCategory)
     }
-
     if (search.trim()) {
       const q = search.toLowerCase()
       list = list.filter((p) =>
@@ -49,11 +51,9 @@ export default function ShopPage() {
         p.tags?.some((t) => t.toLowerCase().includes(q))
       )
     }
-
     return list
   }, [allProducts, activeCategory, search])
 
-  // Conteggio per categoria calcolato dai dati reali
   const countByCategory = useMemo(() => {
     const map = {}
     allProducts.forEach((p) => { map[p.category] = (map[p.category] || 0) + 1 })
@@ -93,13 +93,8 @@ export default function ShopPage() {
               <svg className={styles.searchIcon} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
               </svg>
-              <input
-                type="text"
-                className={styles.searchInput}
-                placeholder="es. shiba, gatto..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
+              <input type="text" className={styles.searchInput} placeholder="Cerca..."
+                value={search} onChange={(e) => setSearch(e.target.value)} />
               {search && <button className={styles.searchClear} onClick={() => setSearch('')}>✕</button>}
             </div>
           </div>
@@ -135,15 +130,8 @@ export default function ShopPage() {
         </aside>
 
         <section className={styles.grid}>
-          {error && (
-            <div className={styles.empty}>
-              <span className={styles.emptyIcon}>⚠️</span>
-              <p>Errore: {error}</p>
-            </div>
-          )}
-
+          {error && <div className={styles.empty}><span className={styles.emptyIcon}>⚠️</span><p>Errore: {error}</p></div>}
           {loading && !error && Array(6).fill(0).map((_, i) => <SkeletonCard key={i} />)}
-
           {!loading && !error && products.length === 0 && (
             <div className={styles.empty}>
               <span className={styles.emptyIcon}>🔍</span>
@@ -151,7 +139,6 @@ export default function ShopPage() {
               {search && <button className="btn btn-outline" onClick={() => setSearch('')}>Cancella ricerca</button>}
             </div>
           )}
-
           {!loading && !error && products.map((product) => {
             const added = addedIds.has(product.id)
             const imgUrl = product.images?.[0]
