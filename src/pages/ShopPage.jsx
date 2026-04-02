@@ -43,14 +43,24 @@ export default function ShopPage() {
     if (activeCategory !== 'tutti') {
       list = list.filter((p) => p.category === activeCategory)
     }
-    if (search.trim()) {
-      const q = search.toLowerCase()
-      list = list.filter((p) =>
-        p.name.toLowerCase().includes(q) ||
-        p.category.toLowerCase().includes(q) ||
-        p.tags?.some((t) => t.toLowerCase().includes(q))
-      )
-    }
+
+
+
+
+ if (search.trim()) {
+  const q = search.toLowerCase()
+  list = list.filter((p) => {
+    const catLabel = dbCategories.find((c) => c.slug === p.category)?.name?.toLowerCase() || ''
+    return (
+      p.name.toLowerCase().includes(q) ||
+      p.category.toLowerCase().includes(q) ||
+      catLabel.includes(q) ||
+      p.tags?.some((t) => t.toLowerCase().includes(q))
+    )
+  })
+}
+
+
     return list
   }, [allProducts, activeCategory, search])
 
