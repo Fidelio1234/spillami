@@ -345,7 +345,8 @@ function ProductForm({ products, loading: productsLoading, refetch }) {
     e.preventDefault()
     setSaving(true)
     setError('')
-    try {
+  
+    const attempt = async () => {
       const payload = {
         name: form.name.trim(),
         description: form.description.trim(),
@@ -361,13 +362,26 @@ function ProductForm({ products, loading: productsLoading, refetch }) {
       }
       if (isNew) await productService.create(payload)
       else await productService.update(id, payload)
-      await refetch()
-      setSaved(true)
-      setTimeout(() => navigate('/admin/products'), 1200)
-    } catch (err) {
-      setError('Errore salvataggio: ' + err.message)
-      setSaving(false)
     }
+  
+    try {
+      // Primo tentativo
+      await attempt()
+    } catch (err) {
+      // Retry automatico dopo 2 secondi
+      try {
+        await new Promise((r) => setTimeout(r, 2000))
+        await attempt()
+      } catch (err2) {
+        setError('Errore salvataggio: ' + err2.message + ' — Riprova.')
+        setSaving(false)
+        return
+      }
+    }
+  
+    await refetch()
+    setSaved(true)
+    setTimeout(() => navigate('/admin/products'), 1200)
   }
 
   return (
