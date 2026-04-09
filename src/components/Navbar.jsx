@@ -25,9 +25,10 @@ export default function Navbar({ onCartOpen }) {
   return (
     <header className={`${styles.header} ${scrolled ? styles.scrolled : ''}`}>
       <nav className={styles.nav}>
-        <Link to="/" className={styles.logo}>
-          <img src="/logo.jpg" alt="Spillami" className={styles.logoImg} />
-        </Link>
+
+      <Link to="/" className={styles.logo}>
+  <img src="/shop4.png" alt="Shop" className={styles.logoImg} />
+</Link>
 
         <ul className={`${styles.links} ${menuOpen ? styles.linksOpen : ''}`}>
           <li><NavLink to="/shop" end className={({ isActive }) => isActive ? styles.active : ''}>Shop</NavLink></li>

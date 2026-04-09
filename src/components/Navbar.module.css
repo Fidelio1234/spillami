@@ -22,7 +22,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 2rem;
+  gap: 1rem;
 }
 
 /* Logo */
@@ -33,10 +33,11 @@
 }
 
 .logoImg {
-  height: 64px;
+  height: 185px;
   width: auto;
   display: block;
   object-fit: contain;
+  max-width: 270px;
 }
 
 .logoPin {
