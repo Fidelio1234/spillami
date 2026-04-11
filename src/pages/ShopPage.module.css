@@ -14,13 +14,16 @@
 }
 
 .pageTitle {
-  font-family: var(--font-display);
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
   font-size: 38px;
   font-weight: 500;
 }
 
 .pageCount {
-  font-size: 13px;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  font-size: 15px;
   color: var(--ink-muted);
   margin-top: 4px;
 }
