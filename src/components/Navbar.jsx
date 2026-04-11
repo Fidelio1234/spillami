@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { useCartStore } from '../store/cartStore'
 import { useAuthStore } from '../store/authStore'
@@ -8,11 +8,13 @@ import styles from './Navbar.module.css'
 export default function Navbar({ onCartOpen }) {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [openDropdown, setOpenDropdown] = useState(null)
   const items = useCartStore((s) => s.items)
   const { user, isAdmin } = useAuthStore()
-  const { categories } = useCategories()
+  const { mainCategories, getChildren, hasChildren } = useCategories()
   const totalItems = items.reduce((sum, i) => sum + i.quantity, 0)
   const location = useLocation()
+  const timeoutRef = useRef(null)
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
@@ -20,28 +22,69 @@ export default function Navbar({ onCartOpen }) {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  useEffect(() => { setMenuOpen(false) }, [location])
+  useEffect(() => { setMenuOpen(false); setOpenDropdown(null) }, [location])
+
+  const handleMouseEnter = (catId) => {
+    clearTimeout(timeoutRef.current)
+    setOpenDropdown(catId)
+  }
+
+  const handleMouseLeave = () => {
+    timeoutRef.current = setTimeout(() => setOpenDropdown(null), 150)
+  }
 
   return (
     <header className={`${styles.header} ${scrolled ? styles.scrolled : ''}`}>
       <nav className={styles.nav}>
-
-      <Link to="/" className={styles.logo}>
-  <img src="/shop4.png" alt="Shop" className={styles.logoImg} />
-</Link>
+        <Link to="/" className={styles.logo}>
+          <img src="/shop4.png" alt="Shop" className={styles.logoImg} />
+        </Link>
 
         <ul className={`${styles.links} ${menuOpen ? styles.linksOpen : ''}`}>
           <li><NavLink to="/shop" end className={({ isActive }) => isActive ? styles.active : ''}>Shop</NavLink></li>
-          {categories.map((cat) => (
-            <li key={cat.id}>
+
+          {mainCategories.map((cat) => (
+            <li
+              key={cat.id}
+              className={styles.navItem}
+              onMouseEnter={() => hasChildren(cat.id) ? handleMouseEnter(cat.id) : null}
+              onMouseLeave={hasChildren(cat.id) ? handleMouseLeave : null}
+            >
               <NavLink
                 to={`/shop?cat=${cat.slug}`}
-                className={({ isActive }) => isActive ? styles.active : ''}
+                className={({ isActive }) => `${isActive ? styles.active : ''} ${hasChildren(cat.id) ? styles.hasDropdown : ''}`}
               >
                 {cat.name}
+                {hasChildren(cat.id) && <span className={styles.dropdownArrow}>▾</span>}
+              </NavLink>
+
+              {hasChildren(cat.id) && openDropdown === cat.id && (
+                <div
+                  className={styles.dropdown}
+                  onMouseEnter={() => handleMouseEnter(cat.id)}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  {getChildren(cat.id).map((child) => (
+                    <Link
+                      key={child.id}
+                      to={`/shop?cat=${child.slug}`}
+                      className={styles.dropdownItem}
+                    >
+                      {child.name}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </li>
+          ))}
+
+          {isAdmin && (
+            <li>
+              <NavLink to="/admin" className={({ isActive }) => isActive ? styles.adminLink : styles.adminLinkInactive}>
+                Admin
               </NavLink>
             </li>
-          ))} 
+          )}
         </ul>
 
         <div className={styles.right}>

@@ -25,7 +25,6 @@
   gap: 1rem;
 }
 
-/* Logo */
 .logo {
   display: flex;
   align-items: center;
@@ -33,18 +32,13 @@
 }
 
 .logoImg {
-  height: 185px;
+  height: 55px;
   width: auto;
   display: block;
   object-fit: contain;
-  max-width: 270px;
+  max-width: 220px;
 }
 
-.logoPin {
-  font-size: 18px;
-}
-
-/* Nav links */
 .links {
   display: flex;
   list-style: none;
@@ -87,15 +81,9 @@
   transform: scaleX(1);
 }
 
-.adminLink {
-  color: var(--terracotta) !important;
-}
+.adminLink { color: var(--terracotta) !important; }
+.adminLinkInactive { color: var(--ink-muted); }
 
-.adminLinkInactive {
-  color: var(--ink-muted);
-}
-
-/* Right side */
 .right {
   display: flex;
   align-items: center;
@@ -112,12 +100,8 @@
 }
 .loginLink:hover { color: var(--ink); }
 
-.accountBtn {
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-}
+.accountBtn { background: none; border: none; padding: 0; cursor: pointer; }
+
 .avatar {
   display: flex;
   align-items: center;
@@ -160,10 +144,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  line-height: 1;
 }
 
-/* Hamburger */
 .hamburger {
   display: none;
   flex-direction: column;
@@ -187,7 +169,63 @@
 .barX2 { opacity: 0; }
 .barX3 { transform: translateY(-6.5px) rotate(-45deg); }
 
-/* Mobile */
+/* ── DROPDOWN ─────────────────────── */
+.navItem {
+  position: relative;
+}
+
+.dropdownArrow {
+  font-size: 10px;
+  color: var(--ink-muted);
+  margin-left: 3px;
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 14px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--paper);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  min-width: 180px;
+  z-index: 200;
+  overflow: hidden;
+  animation: fadeDropdown 0.15s ease;
+}
+
+@keyframes fadeDropdown {
+  from { opacity: 0; transform: translateX(-50%) translateY(-6px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.dropdownItem {
+  display: block;
+  padding: 10px 16px;
+  font-size: 13px;
+  color: var(--ink-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: background 150ms, color 150ms;
+  border-bottom: 0.5px solid var(--border);
+  white-space: nowrap;
+}
+
+.dropdownItem:last-child { border-bottom: none; }
+.dropdownItem:hover { background: var(--cream-dark); color: var(--ink); }
+
+/* ── SIDEBAR SHOP SOTTOCATEGORIE ──── */
+.subCatList {
+  list-style: none;
+  margin-top: 2px;
+  padding-left: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* ── MOBILE ───────────────────────── */
 @media (max-width: 768px) {
   .hamburger { display: flex; }
 
@@ -203,13 +241,10 @@
     padding: 1.5rem 2rem;
     gap: 1.5rem;
     align-items: flex-start;
+    z-index: 100;
   }
 
-  .linksOpen {
-    display: flex;
-  }
-
-  .nav {
-    padding: 0 1.25rem;
-  }
+  .linksOpen { display: flex; }
+  .nav { padding: 0 1.25rem; }
+  .dropdown { position: static; transform: none; box-shadow: none; border: none; animation: none; padding-left: 1rem; }
 }

@@ -64,10 +64,18 @@ function ConfirmModal({ open, title, message, onConfirm, onCancel, loading }) {
   )
 }
 
+
+
+
+
 // ── Gestione Categorie ────────────────────────────────────
+// Questo è il componente CategoriesManager aggiornato
+// Sostituisci la funzione CategoriesManager in AdminPage.jsx con questa
+
 function CategoriesManager() {
-  const { categories, loading, refetch } = useCategories()
+  const { categories, mainCategories, getChildren, loading, refetch } = useCategories()
   const [newCat, setNewCat] = useState('')
+  const [parentId, setParentId] = useState('')
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState(null)
   const [error, setError] = useState('')
@@ -79,8 +87,9 @@ function CategoriesManager() {
     setSaving(true)
     setError('')
     try {
-      await categoryService.create(newCat)
+      await categoryService.create(newCat, parentId || null)
       setNewCat('')
+      setParentId('')
       await refetch()
     } catch (err) {
       setError(err.message)
@@ -107,36 +116,63 @@ function CategoriesManager() {
       <ConfirmModal
         open={modal.open}
         title="Elimina categoria"
-        message={`Sei sicuro di voler eliminare "${modal.name}"?`}
+        message={`Sei sicuro di voler eliminare "${modal.name}"? Verranno eliminate anche le sottocategorie.`}
         onConfirm={handleDelete}
         onCancel={() => setModal({ open: false, id: null, name: '' })}
         loading={!!deleting}
       />
       <h3 className={styles.catSectionTitle}>Gestisci categorie</h3>
+
       <form className={styles.catForm} onSubmit={handleAdd}>
         <input className={styles.input} type="text" value={newCat}
-          onChange={(e) => setNewCat(e.target.value)} placeholder="Es. Tartarughe, Pesci..." style={{ flex: 1 }} />
+          onChange={(e) => setNewCat(e.target.value)}
+          placeholder="Nome categoria o sottocategoria..."
+          style={{ flex: 1 }} />
+        <select
+          className={styles.select}
+          value={parentId}
+          onChange={(e) => setParentId(e.target.value)}
+          style={{ maxWidth: '200px' }}
+        >
+          <option value="">Categoria principale</option>
+          {mainCategories.map((cat) => (
+            <option key={cat.id} value={cat.id}>{cat.name}</option>
+          ))}
+        </select>
         <button type="submit" className="btn btn-terra" disabled={saving || !newCat.trim()}>
           {saving ? '...' : '+ Aggiungi'}
         </button>
       </form>
+
       {error && <p className={styles.errorMsg}>{error}</p>}
-      <div className={styles.catList}>
+
+      <div className={styles.catTree}>
         {loading ? (
           <p style={{ fontSize: '13px', color: 'var(--ink-faint)' }}>Caricamento...</p>
-        ) : categories.length === 0 ? (
+        ) : mainCategories.length === 0 ? (
           <p style={{ fontSize: '13px', color: 'var(--ink-faint)' }}>Nessuna categoria ancora.</p>
-        ) : categories.map((cat) => (
-          <div key={cat.id} className={styles.catChip}>
-            <span>{cat.name}</span>
-            <button className={styles.catDelete}
-              onClick={() => setModal({ open: true, id: cat.id, name: cat.name })}>✕</button>
+        ) : mainCategories.map((cat) => (
+          <div key={cat.id} className={styles.catTreeItem}>
+            <div className={styles.catChip}>
+              <span>📁 {cat.name}</span>
+              <button className={styles.catDelete}
+                onClick={() => setModal({ open: true, id: cat.id, name: cat.name })}>✕</button>
+            </div>
+            {getChildren(cat.id).map((child) => (
+              <div key={child.id} className={styles.catChipChild}>
+                <span>↳ {child.name}</span>
+                <button className={styles.catDelete}
+                  onClick={() => setModal({ open: true, id: child.id, name: child.name })}>✕</button>
+              </div>
+            ))}
           </div>
         ))}
       </div>
     </div>
   )
 }
+
+
 
 // ── Dashboard ─────────────────────────────────────────────
 function AdminDashboard({ products, loading }) {
@@ -171,6 +207,9 @@ function AdminDashboard({ products, loading }) {
     </div>
   )
 }
+
+
+
 
 // ── Lista prodotti ─────────────────────────────────────────
 function AdminProducts({ products, loading, error, refetch }) {
@@ -277,7 +316,7 @@ function ProductForm({ products, loading: productsLoading, refetch }) {
   const isNew = !id || id === 'new'
   const navigate = useNavigate()
   const fileInputRef = useRef()
-  const { categories } = useCategories()
+  const { categories, mainCategories, getChildren } = useCategories()
 
   const [productName, setProductName] = useState('')
   const [form, setForm] = useState({
@@ -318,15 +357,22 @@ function ProductForm({ products, loading: productsLoading, refetch }) {
     const file = e.target.files?.[0]
     if (!file) return
     if (file.size > 5 * 1024 * 1024) { setError('Immagine troppo grande. Max 5MB.'); return }
+    
     setUploading(true)
     setError('')
+    
     try {
-      const tempId = id && id !== 'new' ? id : `temp-${Date.now()}`
-      const url = await productService.uploadImage(file, tempId)
+      // Timeout di 15 secondi
+      const uploadPromise = productService.uploadImage(file, id && id !== 'new' ? id : `temp-${Date.now()}`)
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Upload timeout — riprova')), 15000)
+      )
+      
+      const url = await Promise.race([uploadPromise, timeoutPromise])
       setImages((prev) => [...prev, url])
       if (fileInputRef.current) fileInputRef.current.value = ''
     } catch (err) {
-      setError('Errore upload: ' + err.message)
+      setError('Errore upload: ' + err.message + ' — Riprova.')
     } finally {
       setUploading(false)
     }
@@ -419,22 +465,46 @@ function ProductForm({ products, loading: productsLoading, refetch }) {
                   value={form.stock} onChange={(e) => set('stock', e.target.value)} required placeholder="20" />
               </div>
             </div>
+
+
+
+
+
+
             <div className={styles.fieldRow}>
-              <div className={styles.field}>
-                <label className={styles.label}>Categoria</label>
-                <select className={styles.select} value={form.category} onChange={(e) => set('category', e.target.value)}>
-                  <option value="">Seleziona categoria...</option>
-                  {categories.map((cat) => (
-                    <option key={cat.id} value={cat.slug}>{cat.name}</option>
-                  ))}
-                </select>
-              </div>
-              <div className={styles.field}>
-                <label className={styles.label}>Badge (opzionale)</label>
-                <input className={styles.input} type="text" value={form.badge}
-                  onChange={(e) => set('badge', e.target.value)} placeholder="Es. Nuovo, Bestseller..." />
-              </div>
-            </div>
+  <div className={styles.field}>
+    <label className={styles.label}>Categoria</label>
+    <select
+      className={styles.select}
+      value={form.category}
+      onChange={(e) => set('category', e.target.value)}
+      required
+    >
+      <option value="">Seleziona categoria...</option>
+      {mainCategories.map((main) => {
+        const children = getChildren(main.id)
+        if (children.length > 0) {
+          return (
+            <optgroup key={main.id} label={main.name}>
+              {children.map((child) => (
+                <option key={child.id} value={child.slug}>{child.name}</option>
+              ))}
+            </optgroup>
+          )
+        }
+        return <option key={main.id} value={main.slug}>{main.name}</option>
+      })}
+    </select>
+  </div>
+  <div className={styles.field}>
+    <label className={styles.label}>Badge (opzionale)</label>
+    <input className={styles.input} type="text" value={form.badge}
+      onChange={(e) => set('badge', e.target.value)} placeholder="Es. Nuovo, Bestseller..." />
+  </div>
+</div>
+
+
+            
             <div className={styles.fieldRow}>
               <div className={styles.field}>
                 <label className={styles.label}>Emoji</label>
