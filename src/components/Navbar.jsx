@@ -37,7 +37,7 @@ export default function Navbar({ onCartOpen }) {
     <header className={`${styles.header} ${scrolled ? styles.scrolled : ''}`}>
       <nav className={styles.nav}>
         <Link to="/" className={styles.logo}>
-          <img src="/shop4.png" alt="Shop" className={styles.logoImg} />
+          <img src="/logo3.png" alt="Shop" className={styles.logoImg} />
         </Link>
 
         <ul className={`${styles.links} ${menuOpen ? styles.linksOpen : ''}`}>
