@@ -32,11 +32,11 @@
 }
 
 .logoImg {
-  height: 76px;
+  height: 196px;
   width: auto;
   display: block;
   object-fit: contain;
-  max-width: 220px;
+  max-width: 250px;
 }
 
 .links {
