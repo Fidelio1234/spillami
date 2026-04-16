@@ -38,31 +38,45 @@ export default function ShopPage() {
     ...dbCategories.map((c) => ({ id: c.slug, label: c.name }))
   ], [dbCategories])
 
-  const products = useMemo(() => {
-    let list = allProducts
-    if (activeCategory !== 'tutti') {
+
+
+
+
+
+
+const products = useMemo(() => {
+  let list = allProducts
+  if (activeCategory !== 'tutti') {
+    const currentCat = dbCategories.find((c) => c.slug === activeCategory)
+    if (currentCat) {
+      const children = dbCategories.filter((c) => c.parent_id === currentCat.id)
+      if (children.length > 0) {
+        const childSlugs = children.map((c) => c.slug)
+        list = list.filter((p) => childSlugs.includes(p.category))
+      } else {
+        list = list.filter((p) => p.category === activeCategory)
+      }
+    } else {
       list = list.filter((p) => p.category === activeCategory)
     }
+  }
+  if (search.trim()) {
+    const q = search.toLowerCase()
+    list = list.filter((p) => {
+      const catLabel = dbCategories.find((c) => c.slug === p.category)?.name?.toLowerCase() || ''
+      return (
+        p.name.toLowerCase().includes(q) ||
+        p.category.toLowerCase().includes(q) ||
+        catLabel.includes(q) ||
+        p.tags?.some((t) => t.toLowerCase().includes(q))
+      )
+    })
+  }
+  return list
+}, [allProducts, activeCategory, search, dbCategories])
 
 
 
-
- if (search.trim()) {
-  const q = search.toLowerCase()
-  list = list.filter((p) => {
-    const catLabel = dbCategories.find((c) => c.slug === p.category)?.name?.toLowerCase() || ''
-    return (
-      p.name.toLowerCase().includes(q) ||
-      p.category.toLowerCase().includes(q) ||
-      catLabel.includes(q) ||
-      p.tags?.some((t) => t.toLowerCase().includes(q))
-    )
-  })
-}
-
-
-    return list
-  }, [allProducts, activeCategory, search])
 
   const countByCategory = useMemo(() => {
     const map = {}
