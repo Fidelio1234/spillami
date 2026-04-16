@@ -12,7 +12,6 @@ export default function CartDrawer({ open, onClose }) {
   const updateQuantity = useCartStore((s) => s.updateQuantity)
   const totalPrice = items.reduce((s, i) => s + i.price * i.quantity, 0)
 
-  // Blocca scroll body quando il drawer è aperto
   useEffect(() => {
     document.body.style.overflow = open ? 'hidden' : ''
     return () => { document.body.style.overflow = '' }
@@ -20,21 +19,18 @@ export default function CartDrawer({ open, onClose }) {
 
   return (
     <>
-      {/* Overlay */}
       <div
         className={`${styles.overlay} ${open ? styles.overlayOpen : ''}`}
         onClick={onClose}
         aria-hidden="true"
       />
 
-      {/* Drawer */}
       <aside
         className={`${styles.drawer} ${open ? styles.drawerOpen : ''}`}
         aria-label="Carrello"
         role="dialog"
         aria-modal="true"
       >
-        {/* Header */}
         <div className={styles.header}>
           <h2 className={styles.title}>Il tuo carrello</h2>
           <button className={styles.closeBtn} onClick={onClose} aria-label="Chiudi carrello">
@@ -44,7 +40,6 @@ export default function CartDrawer({ open, onClose }) {
           </button>
         </div>
 
-        {/* Contenuto */}
         <div className={styles.body}>
           {items.length === 0 ? (
             <div className={styles.empty}>
@@ -56,53 +51,67 @@ export default function CartDrawer({ open, onClose }) {
             </div>
           ) : (
             <ul className={styles.list}>
-              {items.map((item) => (
-                <li key={item.id} className={styles.item}>
-                  {/* Immagine / emoji */}
-                  <div
-                    className={styles.itemImg}
-                    style={{ background: item.color || '#F0EAE0' }}
-                  >
-                    <span>{item.emoji || '📌'}</span>
-                  </div>
-
-                  {/* Info */}
-                  <div className={styles.itemInfo}>
-                    <p className={styles.itemName}>{item.name}</p>
-                    <p className={styles.itemPrice}>{fmt(item.price)}</p>
-
-                    {/* Quantità */}
-                    <div className={styles.controls}>
-                      <button
-                        className={styles.qtyBtn}
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                        aria-label="Diminuisci"
-                      >−</button>
-                      <span className={styles.qty}>{item.quantity}</span>
-                      <button
-                        className={styles.qtyBtn}
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                        aria-label="Aumenta"
-                      >+</button>
-                      <button
-                        className={styles.removeBtn}
-                        onClick={() => removeItem(item.id)}
-                        aria-label="Rimuovi"
-                      >Rimuovi</button>
+              {items.map((item) => {
+                const atMaxStock = item.stock != null && item.quantity >= item.stock
+                return (
+                  <li key={item.id} className={styles.item}>
+                    {/* Immagine reale o emoji fallback */}
+                    <div
+                      className={styles.itemImg}
+                      style={{ background: item.color || '#F0EAE0' }}
+                    >
+                      {item.images?.[0]
+                        ? <img
+                            src={item.images[0]}
+                            alt={item.name}
+                            style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '6px' }}
+                          />
+                        : <span>{item.emoji || '📌'}</span>
+                      }
                     </div>
-                  </div>
 
-                  {/* Subtotale */}
-                  <p className={styles.itemTotal}>
-                    {fmt(item.price * item.quantity)}
-                  </p>
-                </li>
-              ))}
+                    <div className={styles.itemInfo}>
+                      <p className={styles.itemName}>{item.name}</p>
+                      <p className={styles.itemPrice}>{fmt(item.price)}</p>
+
+                      <div className={styles.controls}>
+                        <button
+                          className={styles.qtyBtn}
+                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                          aria-label="Diminuisci"
+                        >−</button>
+                        <span className={styles.qty}>{item.quantity}</span>
+                        <button
+                          className={styles.qtyBtn}
+                          onClick={() => !atMaxStock && updateQuantity(item.id, item.quantity + 1)}
+                          aria-label="Aumenta"
+                          disabled={atMaxStock}
+                          style={{ opacity: atMaxStock ? 0.3 : 1, cursor: atMaxStock ? 'not-allowed' : 'pointer' }}
+                        >+</button>
+                        <button
+                          className={styles.removeBtn}
+                          onClick={() => removeItem(item.id)}
+                          aria-label="Rimuovi"
+                        >Rimuovi</button>
+                      </div>
+
+                      {atMaxStock && (
+                        <p style={{ fontSize: '11px', color: 'var(--terracotta)', marginTop: '4px' }}>
+                          Quantità massima disponibile
+                        </p>
+                      )}
+                    </div>
+
+                    <p className={styles.itemTotal}>
+                      {fmt(item.price * item.quantity)}
+                    </p>
+                  </li>
+                )
+              })}
             </ul>
           )}
         </div>
 
-        {/* Footer con totale */}
         {items.length > 0 && (
           <div className={styles.footer}>
             <div className={styles.totalRow}>
