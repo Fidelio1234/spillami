@@ -12,32 +12,20 @@ export function useProducts({ category, search, sortBy, limit } = {}) {
 
   useEffect(() => {
     let cancelled = false
-
     const fetch = async () => {
       if (!hasData.current) setLoading(true)
       setError(null)
-
       try {
         let query = supabase.from('products').select('*').eq('active', true)
-
         if (category && category !== 'tutti') {
-          // Recupera tutte le categorie per trovare le sottocategorie
           const { data: allCats } = await supabase.from('categories').select('*')
-
           if (allCats) {
-            // Trova la categoria corrente
             const currentCat = allCats.find((c) => c.slug === category)
-
             if (currentCat) {
-              // Trova tutte le sottocategorie della categoria corrente
               const children = allCats.filter((c) => c.parent_id === currentCat.id)
-
               if (children.length > 0) {
-                // È una categoria principale con sottocategorie → filtra per tutte le sotto
-                const childSlugs = children.map((c) => c.slug)
-                query = query.in('category', childSlugs)
+                query = query.in('category', children.map((c) => c.slug))
               } else {
-                // È una sottocategoria → filtra direttamente
                 query = query.eq('category', category)
               }
             } else {
@@ -45,16 +33,13 @@ export function useProducts({ category, search, sortBy, limit } = {}) {
             }
           }
         }
-
         if (search?.trim()) query = query.ilike('name', `%${search.trim()}%`)
         if (sortBy === 'price-asc') query = query.order('price', { ascending: true })
         else if (sortBy === 'price-desc') query = query.order('price', { ascending: false })
         else if (sortBy === 'name') query = query.order('name', { ascending: true })
         else query = query.order('created_at', { ascending: false })
         if (limit) query = query.limit(limit)
-
         const { data, error } = await query
-
         if (!cancelled) {
           if (error) throw error
           setProducts(data || [])
@@ -66,7 +51,6 @@ export function useProducts({ category, search, sortBy, limit } = {}) {
         if (!cancelled) setLoading(false)
       }
     }
-
     fetch()
     return () => { cancelled = true }
   }, [category, search, sortBy, limit, shopInvalidate])
@@ -142,28 +126,58 @@ export const productService = {
     if (error) throw error
     invalidateShop()
   },
+
+
+
   async uploadImage(file, productId) {
-    const ext = file.name.split('.').pop().toLowerCase()
+    console.log('Upload iniziato:', file.name, file.size)
+  
+    const compress = (f) => new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onerror = reject
+      reader.onload = (e) => {
+        const img = new Image()
+        img.onerror = reject
+        img.onload = () => {
+          const MAX = 1000
+          let w = img.width, h = img.height
+          if (w > MAX) { h = Math.round(h * MAX / w); w = MAX }
+          if (h > MAX) { w = Math.round(w * MAX / h); h = MAX }
+          const canvas = document.createElement('canvas')
+          canvas.width = w
+          canvas.height = h
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h)
+          canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error('Compressione fallita')), 'image/jpeg', 0.80)
+        }
+        img.src = e.target.result
+      }
+      reader.readAsDataURL(f)
+    })
+  
+    const fileToUpload = file.size > 500000 ? await compress(file) : file
+    console.log('Dimensione dopo compressione:', fileToUpload.size)
+  
+    const ext = file.size > 500000 ? 'jpg' : file.name.split('.').pop().toLowerCase()
     const path = `${productId}/${Date.now()}.${ext}`
-    
-    const { error: uploadError } = await supabase.storage
-      .from('product-images')
-      .upload(path, file, { 
-        cacheControl: '3600',
-        upsert: false 
-      })
   
-    if (uploadError) throw uploadError
+    // Upload con timeout di 20 secondi
+    const uploadWithTimeout = new Promise(async (resolve, reject) => {
+      const timer = setTimeout(() => reject(new Error('Timeout — connessione lenta, riprova')), 20000)
+      try {
+        const { data, error } = await supabase.storage
+          .from('product-images')
+          .upload(path, fileToUpload, { cacheControl: '3600', upsert: true })
+        clearTimeout(timer)
+        if (error) reject(error)
+        else resolve(data)
+      } catch (err) {
+        clearTimeout(timer)
+        reject(err)
+      }
+    })
   
-    const { data } = supabase.storage
-      .from('product-images')
-      .getPublicUrl(path)
+    await uploadWithTimeout
   
+    const { data } = supabase.storage.from('product-images').getPublicUrl(path)
     return data.publicUrl
-  },
-  async deleteImage(url) {
-    const path = url.split('/product-images/')[1]
-    if (!path) return
-    await supabase.storage.from('product-images').remove([path])
-  },
-}
+  }}

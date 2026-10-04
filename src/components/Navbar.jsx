@@ -78,13 +78,7 @@ export default function Navbar({ onCartOpen }) {
             </li>
           ))}
 
-          {isAdmin && (
-            <li>
-              <NavLink to="/admin" className={({ isActive }) => isActive ? styles.adminLink : styles.adminLinkInactive}>
-                Admin
-              </NavLink>
-            </li>
-          )}
+
         </ul>
 
         <div className={styles.right}>
