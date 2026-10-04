@@ -58,14 +58,21 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── MARQUEE ───────────────────────────── */}
-      <div className={styles.marqueeWrap} aria-hidden="true">
-        <div className={styles.marquee}>
-          {Array(6).fill('📌 Spillami · Spille per amanti degli animali · ').map((t, i) => (
-            <span key={i}>{t}</span>
-          ))}
-        </div>
-      </div>
+     {/* ── MARQUEE ───────────────────────────── */}
+<div className={styles.marqueeWrap} aria-hidden="true">
+  <div className={styles.marquee}>
+    {Array(3).fill([
+      '📌 Spillami',
+      '🐾 Spille per amanti degli animali',
+      '✂️ Fatte a mano con amore',
+      '🐶 Idee regalo originali',
+      '🐱 Accessori unici',
+      '🌿 Artigianato italiano',
+    ]).flat().map((t, i) => (
+      <span key={i}>{t} · </span>
+    ))}
+  </div>
+</div>
 
       {/* ── PRODOTTI IN EVIDENZA ──────────────── */}
       <section className={styles.featured}>

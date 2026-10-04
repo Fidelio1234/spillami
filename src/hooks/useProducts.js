@@ -1,59 +1,91 @@
 import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabase'
 
-export let shopInvalidate = 0
-export const invalidateShop = () => { shopInvalidate = Date.now() }
+// Usiamo un custom event per invalidare invece di una variabile globale
+export const invalidateShop = () => {
+  window.dispatchEvent(new CustomEvent('shop-invalidate'))
+}
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 
 export function useProducts({ category, search, sortBy, limit } = {}) {
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const hasData = useRef(false)
+  const [invalidateKey, setInvalidateKey] = useState(0)
+
+  // Ascolta l'evento di invalidazione
+  useEffect(() => {
+    const handler = () => setInvalidateKey((k) => k + 1)
+    window.addEventListener('shop-invalidate', handler)
+    return () => window.removeEventListener('shop-invalidate', handler)
+  }, [])
 
   useEffect(() => {
     let cancelled = false
-    const fetch = async () => {
-      if (!hasData.current) setLoading(true)
-      setError(null)
-      try {
-        let query = supabase.from('products').select('*').eq('active', true)
-        if (category && category !== 'tutti') {
-          const { data: allCats } = await supabase.from('categories').select('*')
-          if (allCats) {
-            const currentCat = allCats.find((c) => c.slug === category)
-            if (currentCat) {
-              const children = allCats.filter((c) => c.parent_id === currentCat.id)
-              if (children.length > 0) {
-                query = query.in('category', children.map((c) => c.slug))
-              } else {
-                query = query.eq('category', category)
-              }
+
+    const fetchOnce = async () => {
+      let query = supabase.from('products').select('*').eq('active', true)
+
+      if (category && category !== 'tutti') {
+        const { data: allCats } = await supabase.from('categories').select('*')
+        if (allCats) {
+          const currentCat = allCats.find((c) => c.slug === category)
+          if (currentCat) {
+            const children = allCats.filter((c) => c.parent_id === currentCat.id)
+            if (children.length > 0) {
+              query = query.in('category', children.map((c) => c.slug))
             } else {
               query = query.eq('category', category)
             }
+          } else {
+            query = query.eq('category', category)
           }
         }
-        if (search?.trim()) query = query.ilike('name', `%${search.trim()}%`)
-        if (sortBy === 'price-asc') query = query.order('price', { ascending: true })
-        else if (sortBy === 'price-desc') query = query.order('price', { ascending: false })
-        else if (sortBy === 'name') query = query.order('name', { ascending: true })
-        else query = query.order('created_at', { ascending: false })
-        if (limit) query = query.limit(limit)
-        const { data, error } = await query
-        if (!cancelled) {
-          if (error) throw error
-          setProducts(data || [])
-          hasData.current = true
+      }
+
+      if (search?.trim()) query = query.ilike('name', `%${search.trim()}%`)
+      if (sortBy === 'price-asc') query = query.order('price', { ascending: true })
+      else if (sortBy === 'price-desc') query = query.order('price', { ascending: false })
+      else if (sortBy === 'name') query = query.order('name', { ascending: true })
+      else query = query.order('created_at', { ascending: false })
+      if (limit) query = query.limit(limit)
+
+      const { data, error } = await query
+      if (error) throw error
+      return data || []
+    }
+
+    const fetchWithRetry = async () => {
+      if (!hasData.current) setLoading(true)
+      setError(null)
+
+      const MAX_ATTEMPTS = 5
+      for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+        try {
+          const data = await fetchOnce()
+          if (!cancelled) {
+            setProducts(data)
+            hasData.current = true
+            setLoading(false)
+          }
+          return
+        } catch (err) {
+          if (cancelled) return
+          if (attempt < MAX_ATTEMPTS) {
+            await sleep(1000 * attempt) // 1s, 2s, 3s, 4s
+          } else {
+            setError(err.message)
+            setLoading(false)
+          }
         }
-      } catch (err) {
-        if (!cancelled) setError(err.message)
-      } finally {
-        if (!cancelled) setLoading(false)
       }
     }
-    fetch()
+
+    fetchWithRetry()
     return () => { cancelled = true }
-  }, [category, search, sortBy, limit, shopInvalidate])
+  }, [category, search, sortBy, limit, invalidateKey])
 
   return { products, loading, error }
 }
@@ -127,11 +159,7 @@ export const productService = {
     invalidateShop()
   },
 
-
-
   async uploadImage(file, productId) {
-    console.log('Upload iniziato:', file.name, file.size)
-  
     const compress = (f) => new Promise((resolve, reject) => {
       const reader = new FileReader()
       reader.onerror = reject
@@ -153,14 +181,11 @@ export const productService = {
       }
       reader.readAsDataURL(f)
     })
-  
+
     const fileToUpload = file.size > 500000 ? await compress(file) : file
-    console.log('Dimensione dopo compressione:', fileToUpload.size)
-  
     const ext = file.size > 500000 ? 'jpg' : file.name.split('.').pop().toLowerCase()
     const path = `${productId}/${Date.now()}.${ext}`
-  
-    // Upload con timeout di 20 secondi
+
     const uploadWithTimeout = new Promise(async (resolve, reject) => {
       const timer = setTimeout(() => reject(new Error('Timeout — connessione lenta, riprova')), 20000)
       try {
@@ -175,9 +200,9 @@ export const productService = {
         reject(err)
       }
     })
-  
+
     await uploadWithTimeout
-  
     const { data } = supabase.storage.from('product-images').getPublicUrl(path)
     return data.publicUrl
-  }}
+  },
+}

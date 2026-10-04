@@ -1,0 +1,51 @@
+.page {
+    min-height: 100vh;
+    background: var(--cream, #F8F4ED);
+    padding: 4rem 1rem 6rem;
+  }
+  
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+  }
+  
+  .title {
+    font-family: var(--font-display, 'Playfair Display', Georgia, serif);
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 500;
+    color: var(--ink, #1E1C18);
+    margin-bottom: 0.5rem;
+  }
+  
+  .meta {
+    font-size: 13px;
+    color: var(--ink-muted, #6B6660);
+    margin-bottom: 3rem;
+    letter-spacing: 0.02em;
+  }
+  
+  .section {
+    margin-bottom: 2.5rem;
+  }
+  
+  .section h2 {
+    font-family: var(--font-display, 'Playfair Display', Georgia, serif);
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--ink, #1E1C18);
+    margin-bottom: 0.75rem;
+  }
+  
+  .section p {
+    font-size: 15px;
+    line-height: 1.8;
+    color: var(--ink-muted, #6B6660);
+    margin-bottom: 0.75rem;
+  }
+  
+  .updated {
+    font-size: 12px;
+    color: var(--ink-muted, #6B6660);
+    margin-top: 3rem;
+    font-style: italic;
+  }

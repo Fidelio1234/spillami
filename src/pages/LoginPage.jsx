@@ -2,14 +2,16 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import styles from './LoginPage.module.css'
+import { supabase } from '../lib/supabase'
 
 export default function LoginPage() {
   const [mode, setMode] = useState('login') // 'login' | 'register'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [fullName, setFullName] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
-  const [loading, setLoading] = useState('')
+  const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState('')
 
   const { signIn, signUp } = useAuthStore()
@@ -35,6 +37,29 @@ export default function LoginPage() {
       setLoading(false)
     }
   }
+
+
+  const handleForgotPassword = async () => {
+    if (!email) {
+      setError('Inserisci la tua email prima di procedere.')
+      return
+    }
+    setLoading(true)
+    setError('')
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: 'https://smart-shop.it/reset-password',
+      })
+      if (error) throw error
+      setSuccess('Email inviata! Controlla la tua casella per reimpostare la password.')
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+
 
   return (
     <main className={styles.page}>
@@ -94,18 +119,53 @@ export default function LoginPage() {
 
           <div className={styles.field}>
             <label className={styles.label} htmlFor="password">Password</label>
-            <input
-              id="password"
-              type="password"
-              className={styles.input}
-              placeholder={mode === 'register' ? 'Minimo 6 caratteri' : '••••••••'}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={6}
-              autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
-            />
+            <div style={{ position: 'relative' }}>
+              <input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                className={styles.input}
+                placeholder={mode === 'register' ? 'Minimo 6 caratteri' : '••••••••'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                minLength={6}
+                autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+                style={{ paddingRight: '44px' }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? 'Nascondi password' : 'Mostra password'}
+                style={{
+                  position: 'absolute',
+                  right: '12px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: 'var(--ink-faint)',
+                  fontSize: '16px',
+                  padding: 0,
+                  lineHeight: 1,
+                }}
+              >
+                {showPassword ? '🙈' : '👁️'}
+              </button>
+            </div>
           </div>
+
+          {mode === 'login' && (
+  <div style={{ textAlign: 'right', marginTop: '-8px' }}>
+    <button
+      type="button"
+      className={styles.switchBtn}
+      onClick={handleForgotPassword}
+    >
+      Password dimenticata?
+    </button>
+  </div>
+)}
 
           {error && <p className={styles.error}>{error}</p>}
           {success && <p className={styles.successMsg}>{success}</p>}

@@ -54,9 +54,9 @@ export default function Footer() {
         <div className={styles.bottom}>
           <p>© {new Date().getFullYear()} Spillami. Tutti i diritti riservati.</p>
           <div className={styles.bottomLinks}>
-            <Link to="#">Privacy Policy</Link>
-            <Link to="#">Termini e condizioni</Link>
-            <Link to="#">Cookie</Link>
+          <Link to="/privacy">Privacy Policy</Link>
+  <Link to="/termini">Termini e condizioni</Link>
+  <Link to="/privacy#cookie">Cookie</Link>
           </div>
         </div>
       </div>

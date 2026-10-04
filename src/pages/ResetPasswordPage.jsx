@@ -6,6 +6,8 @@ import styles from './LoginPage.module.css'
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirm, setShowConfirm] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
@@ -14,6 +16,10 @@ export default function ResetPasswordPage() {
   const [searchParams] = useSearchParams()
 
   useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'PASSWORD_RECOVERY') setReady(true)
+    })
+
     const tokenHash = searchParams.get('token_hash')
     const type = searchParams.get('type')
     if (tokenHash && type === 'recovery') {
@@ -22,9 +28,9 @@ export default function ResetPasswordPage() {
           if (error) setError('Link non valido o scaduto.')
           else setReady(true)
         })
-    } else {
-      setError('Link non valido.')
     }
+
+    return () => subscription.unsubscribe()
   }, [searchParams])
 
   const handleSubmit = async (e) => {
@@ -32,11 +38,35 @@ export default function ResetPasswordPage() {
     if (password.length < 6) { setError('Minimo 6 caratteri.'); return }
     if (password !== confirm) { setError('Le password non coincidono.'); return }
     setLoading(true)
-    const { error } = await supabase.auth.updateUser({ password })
-    if (error) { setError(error.message); setLoading(false); return }
-    setSuccess(true)
-    setTimeout(() => navigate('/'), 2500)
+    setError('')
+
+    try {
+      const { error } = await supabase.auth.updateUser({ password })
+      if (error) throw error
+      setSuccess(true)
+      setTimeout(() => navigate('/login'), 2500)
+    } catch (err) {
+      setError(err.message || 'Errore durante il salvataggio. Riprova.')
+    } finally {
+      setLoading(false)
+    }
   }
+
+  const eyeBtn = (show, toggle) => (
+    <button
+      type="button"
+      onClick={toggle}
+      aria-label={show ? 'Nascondi password' : 'Mostra password'}
+      style={{
+        position: 'absolute', right: '12px', top: '50%',
+        transform: 'translateY(-50%)', background: 'none',
+        border: 'none', cursor: 'pointer', color: 'var(--ink-faint)',
+        fontSize: '16px', padding: 0, lineHeight: 1,
+      }}
+    >
+      {show ? '🙈' : '👁️'}
+    </button>
+  )
 
   if (success) return (
     <main className={styles.page}>
@@ -68,11 +98,33 @@ export default function ResetPasswordPage() {
           <form className={styles.form} onSubmit={handleSubmit} noValidate>
             <div className={styles.field}>
               <label className={styles.label}>Nuova password</label>
-              <input type="password" className={styles.input} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Minimo 6 caratteri" required />
+              <div style={{ position: 'relative' }}>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  className={styles.input}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Minimo 6 caratteri"
+                  required
+                  style={{ paddingRight: '44px' }}
+                />
+                {eyeBtn(showPassword, () => setShowPassword(!showPassword))}
+              </div>
             </div>
             <div className={styles.field}>
               <label className={styles.label}>Conferma password</label>
-              <input type="password" className={styles.input} value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder="Ripeti la password" required />
+              <div style={{ position: 'relative' }}>
+                <input
+                  type={showConfirm ? 'text' : 'password'}
+                  className={styles.input}
+                  value={confirm}
+                  onChange={(e) => setConfirm(e.target.value)}
+                  placeholder="Ripeti la password"
+                  required
+                  style={{ paddingRight: '44px' }}
+                />
+                {eyeBtn(showConfirm, () => setShowConfirm(!showConfirm))}
+              </div>
             </div>
             <button type="submit" className={`btn btn-terra ${styles.submitBtn}`} disabled={loading}>
               {loading ? 'Salvataggio...' : 'Imposta nuova password'}
