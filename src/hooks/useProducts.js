@@ -205,4 +205,25 @@ export const productService = {
     const { data } = supabase.storage.from('product-images').getPublicUrl(path)
     return data.publicUrl
   },
+
+  async deleteImage(url) {
+    try {
+      const path = url.split('/product-images/')[1]
+      if (!path) return
+      await supabase.storage.from('product-images').remove([path])
+    } catch (err) {
+      console.warn('deleteImage:', err.message)
+    }
+  },
+}
+
+// Mantiene la sessione Supabase attiva mentre si è nell'admin
+// (evita il freeze del form dopo ~2 minuti di inattività)
+export function useAdminKeepAlive() {
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      await supabase.auth.getSession()
+    }, 90_000) // ogni 90 secondi
+    return () => clearInterval(interval)
+  }, [])
 }
