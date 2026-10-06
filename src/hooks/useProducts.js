@@ -50,7 +50,7 @@ export function useProducts({ category, search, sortBy, limit } = {}) {
         if (limit) query = query.limit(limit)
 
         const { data, error } = await query
-        console.log('run result:', cancelled, data?.length)
+        
         if (cancelled) return
         if (error) throw error
         setProducts(data || [])
