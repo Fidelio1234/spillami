@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, memo } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { useCartStore } from '../store/cartStore'
 import { useProducts } from '../hooks/useProducts'
@@ -21,7 +21,7 @@ function SkeletonCard() {
   )
 }
 
-export default function ShopPage() {
+function ShopPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const [search, setSearch] = useState('')
   const [sortBy, setSortBy] = useState('default')
@@ -30,7 +30,7 @@ export default function ShopPage() {
 
   const activeCategory = searchParams.get('cat') || 'tutti'
 
-  const { products: allProducts, loading, error } = useProducts({ sortBy })
+  const { products: allProducts, loading, error } = useProducts({ sortBy, category: activeCategory })
   const { categories: dbCategories } = useCategories()
 
   const CATEGORIES = useMemo(() => [
@@ -38,45 +38,36 @@ export default function ShopPage() {
     ...dbCategories.map((c) => ({ id: c.slug, label: c.name }))
   ], [dbCategories])
 
-
-
-
-
-
-
-const products = useMemo(() => {
-  let list = allProducts
-  if (activeCategory !== 'tutti') {
-    const currentCat = dbCategories.find((c) => c.slug === activeCategory)
-    if (currentCat) {
-      const children = dbCategories.filter((c) => c.parent_id === currentCat.id)
-      if (children.length > 0) {
-        const childSlugs = children.map((c) => c.slug)
-        list = list.filter((p) => childSlugs.includes(p.category))
+  const products = useMemo(() => {
+    let list = allProducts
+    if (activeCategory !== 'tutti') {
+      const currentCat = dbCategories.find((c) => c.slug === activeCategory)
+      if (currentCat) {
+        const children = dbCategories.filter((c) => c.parent_id === currentCat.id)
+        if (children.length > 0) {
+          const childSlugs = children.map((c) => c.slug)
+          list = list.filter((p) => childSlugs.includes(p.category))
+        } else {
+          list = list.filter((p) => p.category === activeCategory)
+        }
       } else {
         list = list.filter((p) => p.category === activeCategory)
       }
-    } else {
-      list = list.filter((p) => p.category === activeCategory)
     }
-  }
-  if (search.trim()) {
-    const q = search.toLowerCase()
-    list = list.filter((p) => {
-      const catLabel = dbCategories.find((c) => c.slug === p.category)?.name?.toLowerCase() || ''
-      return (
-        p.name.toLowerCase().includes(q) ||
-        p.category.toLowerCase().includes(q) ||
-        catLabel.includes(q) ||
-        p.tags?.some((t) => t.toLowerCase().includes(q))
-      )
-    })
-  }
-  return list
-}, [allProducts, activeCategory, search, dbCategories])
-
-
-
+    if (search.trim()) {
+      const q = search.toLowerCase()
+      list = list.filter((p) => {
+        const catLabel = dbCategories.find((c) => c.slug === p.category)?.name?.toLowerCase() || ''
+        return (
+          p.name.toLowerCase().includes(q) ||
+          p.category.toLowerCase().includes(q) ||
+          catLabel.includes(q) ||
+          p.tags?.some((t) => t.toLowerCase().includes(q))
+        )
+      })
+    }
+    return list
+  }, [allProducts, activeCategory, search, dbCategories])
 
   const countByCategory = useMemo(() => {
     const map = {}
@@ -102,7 +93,7 @@ const products = useMemo(() => {
     <main className={styles.page}>
       <div className={styles.pageHead}>
         <div className={styles.pageHeadInner}>
-        <h1 className={styles.pageTitle}>Accessori con un'anima . . .</h1>
+          <h1 className={styles.pageTitle}>Accessori con un'anima . . .</h1>
           <p className={styles.pageCount}>
             {loading ? '...' : `${products.length} prodott${products.length === 1 ? 'o' : 'i'}`}
           </p>
@@ -205,3 +196,5 @@ const products = useMemo(() => {
     </main>
   )
 }
+
+export default ShopPage

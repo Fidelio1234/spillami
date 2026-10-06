@@ -1,21 +1,16 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 
-// Usiamo un custom event per invalidare invece di una variabile globale
 export const invalidateShop = () => {
   window.dispatchEvent(new CustomEvent('shop-invalidate'))
 }
-
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 
 export function useProducts({ category, search, sortBy, limit } = {}) {
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const hasData = useRef(false)
   const [invalidateKey, setInvalidateKey] = useState(0)
 
-  // Ascolta l'evento di invalidazione
   useEffect(() => {
     const handler = () => setInvalidateKey((k) => k + 1)
     window.addEventListener('shop-invalidate', handler)
@@ -24,66 +19,50 @@ export function useProducts({ category, search, sortBy, limit } = {}) {
 
   useEffect(() => {
     let cancelled = false
+    setLoading(true)
 
-    const fetchOnce = async () => {
-      let query = supabase.from('products').select('*').eq('active', true)
+    const run = async () => {
+      try {
+        let query = supabase.from('products').select('*').eq('active', true)
 
-      if (category && category !== 'tutti') {
-        const { data: allCats } = await supabase.from('categories').select('*')
-        if (allCats) {
-          const currentCat = allCats.find((c) => c.slug === category)
-          if (currentCat) {
-            const children = allCats.filter((c) => c.parent_id === currentCat.id)
-            if (children.length > 0) {
-              query = query.in('category', children.map((c) => c.slug))
+        if (category && category !== 'tutti') {
+          const { data: allCats } = await supabase.from('categories').select('*')
+          if (allCats) {
+            const currentCat = allCats.find((c) => c.slug === category)
+            if (currentCat) {
+              const children = allCats.filter((c) => c.parent_id === currentCat.id)
+              if (children.length > 0) {
+                query = query.in('category', children.map((c) => c.slug))
+              } else {
+                query = query.eq('category', category)
+              }
             } else {
               query = query.eq('category', category)
             }
-          } else {
-            query = query.eq('category', category)
           }
         }
-      }
 
-      if (search?.trim()) query = query.ilike('name', `%${search.trim()}%`)
-      if (sortBy === 'price-asc') query = query.order('price', { ascending: true })
-      else if (sortBy === 'price-desc') query = query.order('price', { ascending: false })
-      else if (sortBy === 'name') query = query.order('name', { ascending: true })
-      else query = query.order('created_at', { ascending: false })
-      if (limit) query = query.limit(limit)
+        if (search?.trim()) query = query.ilike('name', `%${search.trim()}%`)
+        if (sortBy === 'price-asc') query = query.order('price', { ascending: true })
+        else if (sortBy === 'price-desc') query = query.order('price', { ascending: false })
+        else if (sortBy === 'name') query = query.order('name', { ascending: true })
+        else query = query.order('created_at', { ascending: false })
+        if (limit) query = query.limit(limit)
 
-      const { data, error } = await query
-      if (error) throw error
-      return data || []
-    }
-
-    const fetchWithRetry = async () => {
-      if (!hasData.current) setLoading(true)
-      setError(null)
-
-      const MAX_ATTEMPTS = 5
-      for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-        try {
-          const data = await fetchOnce()
-          if (!cancelled) {
-            setProducts(data)
-            hasData.current = true
-            setLoading(false)
-          }
-          return
-        } catch (err) {
-          if (cancelled) return
-          if (attempt < MAX_ATTEMPTS) {
-            await sleep(1000 * attempt) // 1s, 2s, 3s, 4s
-          } else {
-            setError(err.message)
-            setLoading(false)
-          }
-        }
+        const { data, error } = await query
+        console.log('run result:', cancelled, data?.length)
+        if (cancelled) return
+        if (error) throw error
+        setProducts(data || [])
+        setError(null)
+      } catch (err) {
+        if (!cancelled) setError(err.message)
+      } finally {
+        if (!cancelled) setLoading(false)
       }
     }
 
-    fetchWithRetry()
+    run()
     return () => { cancelled = true }
   }, [category, search, sortBy, limit, invalidateKey])
 
@@ -217,13 +196,11 @@ export const productService = {
   },
 }
 
-// Mantiene la sessione Supabase attiva mentre si è nell'admin
-// (evita il freeze del form dopo ~2 minuti di inattività)
 export function useAdminKeepAlive() {
   useEffect(() => {
     const interval = setInterval(async () => {
       await supabase.auth.getSession()
-    }, 90_000) // ogni 90 secondi
+    }, 90_000)
     return () => clearInterval(interval)
   }, [])
 }

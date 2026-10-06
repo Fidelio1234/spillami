@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useCartStore } from '../store/cartStore'
-import { useProduct, useProducts } from '../hooks/useProducts'
+import { useProduct } from '../hooks/useProducts'
 import styles from './ProductPage.module.css'
+import { supabase } from '../lib/supabase'
 
 const fmt = (n) =>
   new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(n)
@@ -15,10 +16,14 @@ export default function ProductPage() {
   const [added, setAdded] = useState(false)
   const [activeImg, setActiveImg] = useState(0)
 
-  const { products: related } = useProducts({
-    category: product?.category,
-    limit: 5,
-  })
+  const [related, setRelated] = useState([])
+
+  useEffect(() => {
+    if (!product?.category) return
+    supabase.from('products').select('*').eq('active', true)
+      .eq('category', product.category).neq('id', id).limit(4)
+      .then(({ data }) => setRelated(data || []))
+  }, [product?.category, id])
   const relatedFiltered = related.filter((p) => p.id !== id).slice(0, 4)
 
   if (loading) {

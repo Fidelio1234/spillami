@@ -7,50 +7,52 @@ export const useAuthStore = create((set, get) => ({
   loading: true,
   isAdmin: false,
 
-  // Inizializza sessione (chiamato in App.jsx)
   init: async () => {
+    let initDone = false
+
+    supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'INITIAL_SESSION') return
+      if (!initDone) return
+      if (event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') return
+      if (event === 'SIGNED_IN') return 
+      if (session?.user) {
+        await get().fetchProfile(session.user)
+      } else {
+        set({ user: null, profile: null, isAdmin: false, loading: false })
+      }
+    })
+
     const { data: { session } } = await supabase.auth.getSession()
     if (session?.user) {
       await get().fetchProfile(session.user)
+    } else {
+      set({ loading: false })
     }
-    set({ loading: false })
 
-    // Ascolta i cambiamenti di auth
-    supabase.auth.onAuthStateChange(async (_event, session) => {
-      if (session?.user) {
-        set({ user: session.user })
-        await get().fetchProfile(session.user)
-      } else {
-        set({ user: null, profile: null, isAdmin: false })
-      }
-    })
+    initDone = true
   },
 
-  // Carica il profilo utente da Supabase
   fetchProfile: async (user) => {
-    set({ user })
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', user.id)
       .single()
 
-    if (!error && data) {
-      set({
-        profile: data,
-        isAdmin: data.role === 'admin',
-      })
-    }
+    set({
+      user,
+      profile: data || null,
+      isAdmin: data?.role === 'admin',
+      loading: false,
+    })
   },
 
-  // Login con email e password
   signIn: async (email, password) => {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) throw error
     return data
   },
 
-  // Registrazione
   signUp: async (email, password, fullName) => {
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -61,7 +63,6 @@ export const useAuthStore = create((set, get) => ({
     return data
   },
 
-  // Logout
   signOut: async () => {
     await supabase.auth.signOut()
     set({ user: null, profile: null, isAdmin: false })

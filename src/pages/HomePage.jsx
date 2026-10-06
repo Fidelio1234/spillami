@@ -1,6 +1,7 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useCartStore } from '../store/cartStore'
-import { useProducts } from '../hooks/useProducts'
+import { supabase } from '../lib/supabase'
 import styles from './HomePage.module.css'
 
 const fmt = (n) =>
@@ -8,9 +9,14 @@ const fmt = (n) =>
 
 export default function HomePage() {
   const addItem = useCartStore((s) => s.addItem)
+  const [featured, setFeatured] = useState([])
+  const [loading, setLoading] = useState(true)
 
-  // Carica prodotti con badge (in evidenza) — limite 4
-  const { products: featured, loading } = useProducts({ limit: 4 })
+  useEffect(() => {
+    supabase.from('products').select('*').eq('active', true)
+      .order('created_at', { ascending: false }).limit(4)
+      .then(({ data }) => { setFeatured(data || []); setLoading(false) })
+  }, [])
 
   const handleAdd = (product, e) => {
     addItem(product, 1)
@@ -58,21 +64,21 @@ export default function HomePage() {
         </div>
       </section>
 
-     {/* ── MARQUEE ───────────────────────────── */}
-<div className={styles.marqueeWrap} aria-hidden="true">
-  <div className={styles.marquee}>
-    {Array(3).fill([
-      '📌 Spillami',
-      '🐾 Spille per amanti degli animali',
-      '✂️ Fatte a mano con amore',
-      '🐶 Idee regalo originali',
-      '🐱 Accessori unici',
-      '🌿 Artigianato italiano',
-    ]).flat().map((t, i) => (
-      <span key={i}>{t} · </span>
-    ))}
-  </div>
-</div>
+      {/* ── MARQUEE ───────────────────────────── */}
+      <div className={styles.marqueeWrap} aria-hidden="true">
+        <div className={styles.marquee}>
+          {Array(3).fill([
+            '📌 Spillami',
+            '🐾 Spille per amanti degli animali',
+            '✂️ Fatte a mano con amore',
+            '🐶 Idee regalo originali',
+            '🐱 Accessori unici',
+            '🌿 Artigianato italiano',
+          ]).flat().map((t, i) => (
+            <span key={i}>{t} · </span>
+          ))}
+        </div>
+      </div>
 
       {/* ── PRODOTTI IN EVIDENZA ──────────────── */}
       <section className={styles.featured}>

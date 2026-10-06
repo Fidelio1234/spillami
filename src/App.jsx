@@ -22,7 +22,6 @@ import { lazy, Suspense } from 'react'
 const AdminPage = lazy(() => import('./pages/admin/AdminPage'))
 
 const MAINTENANCE = import.meta.env.VITE_MAINTENANCE === 'true'
-console.log('MAINTENANCE:', import.meta.env.VITE_MAINTENANCE)
 
 function MaintenancePage() {
   return (
@@ -75,20 +74,45 @@ function AdminRoute({ children }) {
   return children
 }
 
-function PublicRoute({ children }) {
+// Non usa useAuthStore — stabile, non si rimonta mai
+function AppLayout() {
+  const [cartOpen, setCartOpen] = useState(false)
+  return (
+    <>
+      <Navbar onCartOpen={() => setCartOpen(true)} />
+      <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
+      <Routes>
+        <Route path="/" element={<HomePage onCartOpen={() => setCartOpen(true)} />} />
+        <Route path="/shop" element={<ShopPage />} />
+        <Route path="/product/:id" element={<ProductPage />} />
+        <Route path="/account" element={<AccountPage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/order-success" element={<OrderSuccessPage />} />
+        <Route path="*" element={
+          <main style={{ textAlign: 'center', padding: '8rem 2rem' }}>
+            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '48px', marginBottom: '1rem' }}>404</h1>
+            <p style={{ color: 'var(--ink-muted)', marginBottom: '2rem' }}>Pagina non trovata</p>
+            <a href="/" className="btn btn-dark">Torna alla home</a>
+          </main>
+        } />
+      </Routes>
+      <Footer />
+    </>
+  )
+}
+
+// Gestisce solo il maintenance — si rimonta senza toccare AppLayout
+function MaintenanceGate() {
   const { isAdmin, loading } = useAuthStore()
-  if (loading) return null
-  if (MAINTENANCE && !isAdmin) return <MaintenancePage />
-  return children
+  if (!loading && MAINTENANCE && !isAdmin) return <MaintenancePage />
+  return null
 }
 
 export default function App() {
-  const [cartOpen, setCartOpen] = useState(false)
   const init = useAuthStore((s) => s.init)
 
   useEffect(() => {
     init()
-    // Ping al DB per svegliare Supabase (piano Free va in sleep)
     supabase.from('products').select('id').limit(1).then(() => {})
   }, [init])
 
@@ -99,41 +123,18 @@ export default function App() {
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/termini" element={<TerminiPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
-
-        <Route
-          path="/admin/*"
-          element={
-            <AdminRoute>
-              <Suspense fallback={<div style={{ padding: '4rem', textAlign: 'center' }}>Caricamento admin...</div>}>
-                <AdminPage />
-              </Suspense>
-            </AdminRoute>
-          }
-        />
-
+        <Route path="/admin/*" element={
+          <AdminRoute>
+            <Suspense fallback={<div style={{ padding: '4rem', textAlign: 'center' }}>Caricamento admin...</div>}>
+              <AdminPage />
+            </Suspense>
+          </AdminRoute>
+        } />
         <Route path="*" element={
-          <PublicRoute>
-            <Navbar onCartOpen={() => setCartOpen(true)} />
-            <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
-            <Routes>
-              <Route path="/" element={<HomePage onCartOpen={() => setCartOpen(true)} />} />
-              <Route path="/shop" element={<ShopPage />} />
-              <Route path="/product/:id" element={<ProductPage />} />
-              <Route path="/account" element={<AccountPage />} />
-              <Route path="/checkout" element={<CheckoutPage />} />
-              <Route path="/order-success" element={<OrderSuccessPage />} />
-              <Route path="*" element={
-                <main style={{ textAlign: 'center', padding: '8rem 2rem' }}>
-                  <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '48px', marginBottom: '1rem' }}>404</h1>
-                  <p style={{ color: 'var(--ink-muted)', marginBottom: '2rem' }}>Pagina non trovata</p>
-                  <a href="/" className="btn btn-dark">Torna alla home</a>
-                </main>
-              } />
-              
-            </Routes>
-            
-            <Footer />
-          </PublicRoute>
+          <>
+            <MaintenanceGate />
+            <AppLayout />
+          </>
         } />
       </Routes>
     </BrowserRouter>
