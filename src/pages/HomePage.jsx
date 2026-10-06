@@ -37,9 +37,9 @@ export default function HomePage() {
         <div className={styles.heroContent}>
           <p className={styles.heroEyebrow}>📌 Spille artigianali per chi ama gli animali</p>
           <h1 className={styles.heroTitle}>
-            Porta il tuo<br />
-            <em>amico del cuore</em><br />
-            sempre con te
+            Ogni accessorio<br />
+            <em>racconta la sua</em><br />
+            storia
           </h1>
           <p className={styles.heroSub}>
             Spille smaltate, accessori e collezioni pensate per chi ha un animale
@@ -51,17 +51,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div className={styles.heroVisual} aria-hidden="true">
-          <div className={styles.heroGrid}>
-            {['🐕','🐈','🐾','🦜','🐰','🦉','😺','🐩'].map((e, i) => (
-              <div key={i} className={styles.heroEmoji} style={{ animationDelay: `${i * 0.1}s` }}>{e}</div>
-            ))}
-          </div>
-          <div className={styles.heroBadge}>
-            <span className={styles.heroBadgeNum}>+50</span>
-            <span className={styles.heroBadgeText}>design unici</span>
-          </div>
-        </div>
+       
       </section>
 
       {/* ── MARQUEE ───────────────────────────── */}
@@ -70,7 +60,7 @@ export default function HomePage() {
           {Array(3).fill([
             '📌 Spillami',
             '🐾 Spille per amanti degli animali',
-            '✂️ Fatte a mano con amore',
+           // '✂️ Fatte a mano con amore',
             '🐶 Idee regalo originali',
             '🐱 Accessori unici',
             '🌿 Artigianato italiano',
@@ -142,7 +132,7 @@ export default function HomePage() {
         )}
       </section>
 
-      {/* ── VALORI ────────────────────────────── */}
+      {/* ── VALORI ────────────────────────────── 
       <section className={styles.values}>
         {[
           { icon: '✋', title: 'Fatto a mano', desc: 'Ogni spilla è smaltata e rifinita artigianalmente.' },
@@ -156,9 +146,9 @@ export default function HomePage() {
             <p className={styles.valueDesc}>{desc}</p>
           </div>
         ))}
-      </section>
+      </section>*/}
 
-      {/* ── CTA ───────────────────────────────── */}
+      {/* ── CTA ───────────────────────────────── 
       <section className={styles.cta}>
         <h2 className={styles.ctaTitle}>Qual è il tuo animale del cuore?</h2>
         <p className={styles.ctaSub}>Trova la spilla perfetta per te o da regalare.</p>
@@ -169,7 +159,7 @@ export default function HomePage() {
             </Link>
           ))}
         </div>
-      </section>
+      </section>*/}
     </main>
   )
 }

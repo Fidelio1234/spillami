@@ -9,7 +9,7 @@ export default function Footer() {
           {/* Brand */}
           <div className={styles.brand}>
             <Link to="/" className={styles.logo}>
-              <img src="/logo.jpg" alt="Spillami" className={styles.logoImg} />
+            <img src="/logo6.png" alt="Spillami" className={styles.logoImg} />
             </Link>
             <p className={styles.tagline}>
               Spille e accessori artigianali per chi ama gli animali.
@@ -22,22 +22,18 @@ export default function Footer() {
             <h3 className={styles.colTitle}>Shop</h3>
             <ul>
               <li><Link to="/shop">Tutti i prodotti</Link></li>
-              <li><Link to="/shop?cat=cani">Cani</Link></li>
-              <li><Link to="/shop?cat=gatti">Gatti</Link></li>
-              <li><Link to="/shop?cat=uccelli">Uccelli</Link></li>
-              <li><Link to="/shop?cat=conigli">Conigli</Link></li>
-              <li><Link to="/shop?cat=collezione">Collezioni</Link></li>
+             
             </ul>
           </div>
 
           <div className={styles.col}>
             <h3 className={styles.colTitle}>Info</h3>
             <ul>
-              <li><Link to="#">Chi siamo</Link></li>
-              <li><Link to="#">Spedizioni</Link></li>
-              <li><Link to="#">Resi e rimborsi</Link></li>
-              <li><Link to="#">FAQ</Link></li>
-              <li><Link to="#">Contatti</Link></li>
+            <li><Link to="/chi-siamo">Chi siamo</Link></li>
+              <li><Link to="/spedizioni">Spedizioni</Link></li>
+              <li><Link to="/resi">Resi e rimborsi</Link></li>
+              <li><Link to="/faq">FAQ</Link></li>
+              <li><Link to="/contatti">Contatti</Link></li>
             </ul>
           </div>
 

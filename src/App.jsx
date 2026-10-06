@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthStore } from './store/authStore'
 import { supabase } from './lib/supabase'
+import { lazy, Suspense } from 'react'
 
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
@@ -17,8 +18,12 @@ import CheckoutPage from './pages/CheckoutPage'
 import OrderSuccessPage from './pages/OrderSuccessPage'
 import TerminiPage from './pages/TerminiPage'
 import PrivacyPage from './pages/PrivacyPage'
+import ResiPage from './pages/ResiPage'
+import SpedizioniPage from './pages/SpedizioniPage'
+import FaqPage from './pages/FaqPage'
+import ContattiPage from './pages/ContattiPage'
+import ChiSiamoPage from './pages/ChiSiamoPage'
 
-import { lazy, Suspense } from 'react'
 const AdminPage = lazy(() => import('./pages/admin/AdminPage'))
 
 const MAINTENANCE = import.meta.env.VITE_MAINTENANCE === 'true'
@@ -88,6 +93,13 @@ function AppLayout() {
         <Route path="/account" element={<AccountPage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/order-success" element={<OrderSuccessPage />} />
+        <Route path="/termini" element={<TerminiPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/resi" element={<ResiPage />} />
+        <Route path="/spedizioni" element={<SpedizioniPage />} />
+        <Route path="/faq" element={<FaqPage />} />
+        <Route path="/contatti" element={<ContattiPage />} />
+        <Route path="/chi-siamo" element={<ChiSiamoPage />} />
         <Route path="*" element={
           <main style={{ textAlign: 'center', padding: '8rem 2rem' }}>
             <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '48px', marginBottom: '1rem' }}>404</h1>
@@ -121,8 +133,6 @@ export default function App() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
-        <Route path="/termini" element={<TerminiPage />} />
-        <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/admin/*" element={
           <AdminRoute>
             <Suspense fallback={<div style={{ padding: '4rem', textAlign: 'center' }}>Caricamento admin...</div>}>

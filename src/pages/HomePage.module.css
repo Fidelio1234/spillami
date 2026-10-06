@@ -3,10 +3,10 @@
   max-width: var(--max-width);
   margin: 0 auto;
   padding: 4rem 2rem 3rem;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4rem;
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  text-align: center;
 }
 
 .heroEyebrow {
@@ -35,18 +35,19 @@
   color: var(--ink-muted);
   max-width: 400px;
   margin-bottom: 2rem;
+  margin-left: auto;
+  margin-right: auto;
 }
+
 
 .heroActions {
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
+  justify-content: center;
 }
 
-/* Griglia emoji hero */
-.heroVisual {
-  position: relative;
-}
+
 
 .heroGrid {
   display: grid;

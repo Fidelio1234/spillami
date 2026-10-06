@@ -18,7 +18,7 @@
   border-bottom: 0.5px solid rgba(248,244,237,0.1);
 }
 
-.brand {}
+
 
 .logo {
   display: block;
@@ -26,11 +26,13 @@
 }
 
 .logoImg {
-  height: 32px;
+  height: 110px;
   width: auto;
   object-fit: contain;
-  filter: brightness(0) invert(1);
-  opacity: 0.85;
+  opacity: 0.7;
+  background: rgba(255,255,255,0.08);
+  border-radius: 6px;
+  padding: 2px 4px;
 }
 
 .tagline {
@@ -40,7 +42,7 @@
   max-width: 260px;
 }
 
-.col {}
+
 
 .colTitle {
   font-family: var(--font-body);

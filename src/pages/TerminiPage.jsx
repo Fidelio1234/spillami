@@ -5,7 +5,7 @@ export default function TerminiPage() {
     <main className={styles.page}>
       <div className={styles.container}>
         <h1 className={styles.title}>Termini e Condizioni di Vendita</h1>
-        <p className={styles.meta}>DMI di Ivan De Mitri · Via Cagliari n. 6 · P.IVA 04623570753 · info@dmiservice.it</p>
+        <p className={styles.meta}>DMI di Ivan De Mitri · Via Cagliari n. 6 · P.IVA 04623570753 · smartshop2026@libero.it</p>
 
         <section className={styles.section}>
           <h2>1. Informazioni generali</h2>

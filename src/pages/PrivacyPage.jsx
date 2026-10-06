@@ -5,11 +5,11 @@ export default function PrivacyPage() {
     <main className={styles.page}>
       <div className={styles.container}>
         <h1 className={styles.title}>Privacy Policy e Cookie Policy</h1>
-        <p className={styles.meta}>DMI di Ivan De Mitri · Via Cagliari n. 6 · P.IVA 04623570753 · info@dmiservice.it</p>
+        <p className={styles.meta}>DMI di Ivan De Mitri · Via Cagliari n. 6 · P.IVA 04623570753 · smartshop2026@libero.it</p>
 
         <section className={styles.section}>
           <h2>1. Titolare del trattamento</h2>
-          <p>DMI di Ivan De Mitri, Via Cagliari n. 6, P.IVA 04623570753, email info@dmiservice.it.</p>
+          <p>DMI di Ivan De Mitri, Via Cagliari n. 6, P.IVA 04623570753, email smartshop2026@libero.it.</p>
         </section>
 
         <section className={styles.section}>
@@ -34,7 +34,7 @@ export default function PrivacyPage() {
 
         <section className={styles.section}>
           <h2>6. Diritti dell'interessato</h2>
-          <p>Ai sensi del GDPR, l'utente può accedere, rettificare, cancellare i propri dati o opporsi al trattamento scrivendo a info@dmiservice.it.</p>
+          <p>Ai sensi del GDPR, l'utente può accedere, rettificare, cancellare i propri dati o opporsi al trattamento scrivendo a smartshop2026@libero.it.</p>
         </section>
 
         <section className={styles.section}>
