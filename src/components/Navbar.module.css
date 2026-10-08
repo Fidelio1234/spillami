@@ -1,5 +1,5 @@
 .header {
-  position: sticky;
+  position: relative;
   top: 0;
   z-index: 100;
   background: rgba(248, 244, 237, 0.85);
@@ -116,9 +116,10 @@
 }
 
 .cartBtn {
+ 
   position: relative;
   background: var(--ink);
-  color: var(--cream);
+  color: white;
   border: none;
   width: 40px;
   height: 40px;
@@ -127,6 +128,7 @@
   align-items: center;
   justify-content: center;
   transition: background 150ms;
+  background: var(--terra-dark);
 }
 .cartBtn:hover { background: var(--terra-dark); }
 

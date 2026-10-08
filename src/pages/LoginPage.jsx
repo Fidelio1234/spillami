@@ -65,9 +65,9 @@ export default function LoginPage() {
     <main className={styles.page}>
       <div className={styles.card}>
         {/* Logo */}
-        <Link to="/" className={styles.logo}>
-          <img src="/logo.jpg" alt="Spillami" style={{ height: '40px', width: 'auto', objectFit: 'contain' }} />
-        </Link>
+        <Link to="/" className={styles.logo} style={{ display: 'flex', justifyContent: 'center' }}>
+  <img src="/logo6.png" alt="Smart-Shop" style={{ height: '150px', width: 'auto', objectFit: 'contain' }} />
+</Link>
 
         {/* Tabs */}
         <div className={styles.tabs}>

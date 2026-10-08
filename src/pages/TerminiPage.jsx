@@ -14,7 +14,7 @@ export default function TerminiPage() {
 
         <section className={styles.section}>
           <h2>2. Prodotti</h2>
-          <p>Spillami vende accessori artigianali fatti a mano. Ogni prodotto è realizzato artigianalmente: potrebbero esserci lievi variazioni rispetto alle immagini mostrate sul sito.</p>
+          <p>Smart-Shop vende accessori artigianali fatti a mano. Ogni prodotto è realizzato artigianalmente: potrebbero esserci lievi variazioni rispetto alle immagini mostrate sul sito.</p>
         </section>
 
         <section className={styles.section}>
@@ -29,7 +29,7 @@ export default function TerminiPage() {
 
         <section className={styles.section}>
           <h2>5. Spedizioni</h2>
-          <p>Spillami effettua spedizioni in Italia e all'estero. I tempi di consegna sono indicativi. I costi di spedizione sono indicati al momento del checkout e sono a carico del Cliente.</p>
+          <p>Smart-Shop effettua spedizioni in Italia e all'estero. I tempi di consegna sono indicativi. I costi di spedizione sono indicati al momento del checkout e sono a carico del Cliente.</p>
         </section>
 
         <section className={styles.section}>

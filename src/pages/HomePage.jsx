@@ -35,7 +35,7 @@ export default function HomePage() {
       {/* ── HERO ─────────────────────────────── */}
       <section className={styles.hero}>
         <div className={styles.heroContent}>
-          <p className={styles.heroEyebrow}>📌 Spille artigianali per chi ama gli animali</p>
+          <p className={styles.heroEyebrow}>📌 Smart- Shop</p>
           <h1 className={styles.heroTitle}>
             Ogni accessorio<br />
             <em>racconta la sua</em><br />

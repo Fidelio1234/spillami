@@ -9,10 +9,10 @@ export default function Footer() {
           {/* Brand */}
           <div className={styles.brand}>
             <Link to="/" className={styles.logo}>
-            <img src="/logo6.png" alt="Spillami" className={styles.logoImg} />
+            <img src="/logo6.png" alt="Smart-Shop" className={styles.logoImg} />
             </Link>
             <p className={styles.tagline}>
-              Spille e accessori artigianali per chi ama gli animali.
+              Spille e accessori artigianali anche per chi ama gli animali.
               Ogni pezzo racconta una storia.
             </p>
           </div>
@@ -48,7 +48,7 @@ export default function Footer() {
         </div>
 
         <div className={styles.bottom}>
-          <p>© {new Date().getFullYear()} Spillami. Tutti i diritti riservati.</p>
+          <p>© {new Date().getFullYear()} SmartShop. Tutti i diritti riservati.</p>
           <div className={styles.bottomLinks}>
           <Link to="/privacy">Privacy Policy</Link>
   <Link to="/termini">Termini e condizioni</Link>

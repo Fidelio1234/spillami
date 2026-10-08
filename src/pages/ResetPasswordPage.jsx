@@ -87,7 +87,7 @@ export default function ResetPasswordPage() {
     <main className={styles.page}>
       <div className={styles.card}>
         <a href="/" className={styles.logo}>
-          <img src="/logo.jpg" alt="Spillami" style={{ height: '40px', width: 'auto' }} />
+          <img src="/logo6.png" alt="Smart-Shop" style={{ height: '40px', width: 'auto' }} />
         </a>
         <div className={styles.tabs}>
           <button className={`${styles.tab} ${styles.tabActive}`}>Nuova password</button>
