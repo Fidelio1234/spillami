@@ -37,13 +37,17 @@ export default function HomePage() {
         <div className={styles.heroContent}>
           <p className={styles.heroEyebrow}>📌 Smart- Shop</p>
           <h1 className={styles.heroTitle}>
-            Ogni accessorio<br />
-            <em>racconta la sua</em><br />
-            storia
+            Shop 
+            <em> Smart,</em><br />
+           Expect
+           <em> More.</em><br />
           </h1>
+          
           <p className={styles.heroSub}>
-            Spille smaltate, accessori e collezioni pensate per chi ha un animale
-            speciale nella propria vita. Ogni pezzo è unico, colorato, irresistibile.
+          Smart Shop è un universo in continua evoluzione, dove creatività, selezione e nuove
+          idee prendono forma.
+
+          Senza etichette. Senza schemi. Senza limiti. 
           </p>
           <div className={styles.heroActions}>
             <Link to="/shop" className="btn btn-dark">Scopri il catalogo</Link>
@@ -58,12 +62,12 @@ export default function HomePage() {
       <div className={styles.marqueeWrap} aria-hidden="true">
         <div className={styles.marquee}>
           {Array(3).fill([
-            '📌 Spillami',
-            '🐾 Spille per amanti degli animali',
+            '📌 NUOVI ARRIVI',
+            '🐾 IDEE REGALO',
            // '✂️ Fatte a mano con amore',
-            '🐶 Idee regalo originali',
-            '🐱 Accessori unici',
-            '🌿 Artigianato italiano',
+            '🐶 HANDMADE',
+            '🐱 SELEZIONATI CON CURA',
+            '🌿 E TANTO ALTRO',
           ]).flat().map((t, i) => (
             <span key={i}>{t} · </span>
           ))}

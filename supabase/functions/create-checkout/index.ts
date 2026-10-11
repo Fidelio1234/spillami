@@ -1,6 +1,6 @@
 // supabase/functions/create-checkout/index.ts
 // Crea una sessione Stripe Checkout e ritorna l'URL
-
+// @ts-nocheck
 import Stripe from 'https://esm.sh/stripe@14.21.0?target=deno'
 
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') ?? '', {
