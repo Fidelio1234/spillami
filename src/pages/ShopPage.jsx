@@ -93,7 +93,7 @@ function ShopPage() {
     <main className={styles.page}>
       <div className={styles.pageHead}>
         <div className={styles.pageHeadInner}>
-          <h1 className={styles.pageTitle}>"Lasciati guidare dalla curiosità."</h1>
+          <h1 className={styles.pageTitle}>Lasciati guidare dalla curiosità</h1>
           <p className={styles.pageCount}>
             {loading ? '...' : `${products.length} prodott${products.length === 1 ? 'o' : 'i'}`}
           </p>

@@ -38,14 +38,14 @@ export default function HomePage() {
           <p className={styles.heroEyebrow}>📌 Smart- Shop</p>
           <h1 className={styles.heroTitle}>
             Shop 
-            <em> Smart,</em><br />
+            <em> Smart.</em><br />
            Expect
            <em> More.</em><br />
           </h1>
           
           <p className={styles.heroSub}>
           Smart Shop è un universo in continua evoluzione, dove creatività, selezione e nuove
-          idee prendono forma.
+          idee prendono forma.<br />
 
           Senza etichette. Senza schemi. Senza limiti. 
           </p>
