@@ -112,12 +112,12 @@ function AppLayout() {
     </>
   )
 }
-
-// Gestisce solo il maintenance — si rimonta senza toccare AppLayout
-function MaintenanceGate() {
+// Mostra la manutenzione OPPURE il sito — mai entrambi
+function PublicArea() {
   const { isAdmin, loading } = useAuthStore()
-  if (!loading && MAINTENANCE && !isAdmin) return <MaintenancePage />
-  return null
+  if (loading) return null
+  if (MAINTENANCE && !isAdmin) return <MaintenancePage />
+  return <AppLayout />
 }
 
 export default function App() {
@@ -140,12 +140,7 @@ export default function App() {
             </Suspense>
           </AdminRoute>
         } />
-        <Route path="*" element={
-          <>
-            <MaintenanceGate />
-            <AppLayout />
-          </>
-        } />
+        <Route path="*" element={<PublicArea />} />
       </Routes>
     </BrowserRouter>
   )
