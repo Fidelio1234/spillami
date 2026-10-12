@@ -9,7 +9,7 @@ export default function Footer() {
           {/* Brand */}
           <div className={styles.brand}>
             <Link to="/" className={styles.logo}>
-            <img src="/logo.png" alt="Smart-Shop" className={styles.logoImg} />
+            <img src="/logo7.png" alt="Smart-Shop" className={styles.logoImg} />
             </Link>
             <p className={styles.tagline}>
               Spille e accessori artigianali anche per chi ama gli animali.

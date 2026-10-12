@@ -35,7 +35,7 @@ export default function HomePage() {
       {/* ── HERO ─────────────────────────────── */}
       <section className={styles.hero}>
         <div className={styles.heroContent}>
-          <p className={styles.heroEyebrow}>📌 Smart- Shop</p>
+          
           <h1 className={styles.heroTitle}>
             Shop 
             <em> Smart.</em><br />
