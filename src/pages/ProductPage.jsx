@@ -17,6 +17,7 @@ export default function ProductPage() {
   const [qty, setQty] = useState(1)
   const [added, setAdded] = useState(false)
   const [activeImg, setActiveImg] = useState(0)
+  const [zoom, setZoom] = useState({ active: false, x: 50, y: 50 })
 
   const [related, setRelated] = useState([])
 
@@ -27,6 +28,12 @@ export default function ProductPage() {
       .then(({ data }) => setRelated(data || []))
   }, [product?.category, id])
   const relatedFiltered = related.filter((p) => p.id !== id).slice(0, 4)
+
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [id])
+
 
   if (loading) {
     return (
@@ -79,16 +86,46 @@ export default function ProductPage() {
       </nav>
 
       <div className={styles.product}>
+
+
+
         {/* Immagini */}
         <div className={styles.imageSection}>
-          <div className={styles.imageWrap} style={{ background: product.color || '#F0EAE0' }}>
+
+
+                  <div
+            className={styles.imageWrap}
+            style={{ background: product.color || '#F0EAE0', overflow: 'hidden' }}
+            onMouseEnter={() => setZoom((z) => ({ ...z, active: true }))}
+            onMouseLeave={() => setZoom((z) => ({ ...z, active: false }))}
+            onMouseMove={(e) => {
+              const r = e.currentTarget.getBoundingClientRect()
+              const x = ((e.clientX - r.left) / r.width) * 100
+              const y = ((e.clientY - r.top) / r.height) * 100
+              setZoom({ active: true, x, y })
+            }}
+          >
             {images ? (
-              <img src={images[activeImg]} alt={product.name} className={styles.productImg} />
+              <img
+                src={images[activeImg]}
+                alt={product.name}
+                className={styles.productImg}
+                style={{
+                  transition: 'transform 0.15s ease-out',
+                  transform: zoom.active ? 'scale(2.2)' : 'scale(1)',
+                  transformOrigin: `${zoom.x}% ${zoom.y}%`,
+                  cursor: zoom.active ? 'zoom-in' : 'default',
+                }}
+              />
             ) : (
               <span className={styles.productEmoji}>{product.emoji || '📌'}</span>
             )}
             {product.badge && <span className={styles.badge}>{product.badge}</span>}
           </div>
+
+
+
+
 
           {/* Thumbnails se ci sono più immagini */}
           {images && images.length > 1 && (

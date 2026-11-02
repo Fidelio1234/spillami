@@ -1,5 +1,5 @@
-import { useState, useMemo, memo } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { useState, useMemo, memo, useLayoutEffect, useRef } from 'react'
+import { Link, useSearchParams, useNavigationType } from 'react-router-dom'
 import { useCartStore } from '../store/cartStore'
 import { useProducts } from '../hooks/useProducts'
 import { useCategories } from '../hooks/useCategories'
@@ -89,6 +89,38 @@ function ShopPage() {
     }, 1400)
   }
 
+  const rememberProduct = (id) => {
+    try { sessionStorage.setItem('lastProduct', id) } catch {}
+  }
+
+  const navType = useNavigationType()
+  const restored = useRef(false)
+
+  // Al ritorno "indietro" riporta in vista l'ultimo prodotto aperto
+  useLayoutEffect(() => {
+    if (loading || restored.current) return
+    restored.current = true
+    if (navType !== 'POP') return
+
+    let pid = null
+    try { pid = sessionStorage.getItem('lastProduct') } catch {}
+    if (!pid) return
+
+    let tries = 0
+    const run = () => {
+      const el = document.getElementById(`card-${pid}`)
+      if (el) {
+        el.scrollIntoView({ block: 'center' })
+        tries++
+        if (tries < 8) setTimeout(run, 120)
+      } else if (tries < 40) {
+        tries++
+        setTimeout(run, 50)
+      }
+    }
+    run()
+  }, [loading, navType])
+
   return (
     <main className={styles.page}>
       <div className={styles.pageHead}>
@@ -158,20 +190,37 @@ function ShopPage() {
             const added = addedIds.has(product.id)
             const imgUrl = product.images?.[0]
             return (
-              <article key={product.id} className={styles.card}>
-                <Link to={`/product/${product.id}`} className={styles.cardImgLink}>
-                  <div className={styles.cardImg} style={{ background: product.color || '#F0EAE0' }}>
+              <article key={product.id} id={`card-${product.id}`} className={styles.card}>
+                <Link to={`/product/${product.id}`} className={styles.cardImgLink}
+                  onClick={() => rememberProduct(product.id)}>
+                  <div
+                    className={styles.cardImg}
+                    style={{ background: product.color || '#F0EAE0', overflow: 'hidden', aspectRatio: '1 / 1' }}
+                    onMouseMove={(e) => {
+                      const img = e.currentTarget.querySelector('img')
+                      if (!img) return
+                      const r = e.currentTarget.getBoundingClientRect()
+                      const x = ((e.clientX - r.left) / r.width) * 100
+                      const y = ((e.clientY - r.top) / r.height) * 100
+                      img.style.transformOrigin = `${x}% ${y}%`
+                      img.style.transform = 'scale(2)'
+                    }}
+                    onMouseLeave={(e) => {
+                      const img = e.currentTarget.querySelector('img')
+                      if (img) img.style.transform = 'scale(1)'
+                    }}
+                  >
                     {imgUrl
-                      ? <img src={imgUrl} alt={product.name} className={styles.cardImgReal} />
+                      ? <img src={imgUrl} alt={product.name} className={styles.cardImgReal}
+                          style={{ transition: 'transform 0.15s ease-out' }} />
                       : <span className={styles.cardEmoji}>{product.emoji || '📌'}</span>
                     }
                     {product.badge && <span className={styles.cardBadge}>{product.badge}</span>}
-                   
                   </div>
                 </Link>
                 <div className={styles.cardBody}>
                   <p className={styles.cardCat}>{product.category}</p>
-                  <Link to={`/product/${product.id}`}>
+                  <Link to={`/product/${product.id}`} onClick={() => rememberProduct(product.id)}>
                     <h3 className={styles.cardName}>{product.name}</h3>
                   </Link>
                   <p className={styles.cardDesc}>{product.description?.slice(0, 70)}…</p>
