@@ -1,15 +1,17 @@
 import { useState, useEffect } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useCartStore } from '../store/cartStore'
 import { useProduct } from '../hooks/useProducts'
 import styles from './ProductPage.module.css'
 import { supabase } from '../lib/supabase'
+
 
 const fmt = (n) =>
   new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(n)
 
 export default function ProductPage() {
   const { id } = useParams()
+  const navigate = useNavigate()
   const { product, loading, error } = useProduct(id)
   const addItem = useCartStore((s) => s.addItem)
   const [qty, setQty] = useState(1)
@@ -55,6 +57,17 @@ export default function ProductPage() {
 
   return (
     <main className={styles.page}>
+    <button
+      onClick={() => navigate(-1)}
+      style={{
+        display: 'inline-flex', alignItems: 'center', gap: '6px',
+        background: 'none', border: '1px solid rgba(30,28,24,0.15)',
+        borderRadius: '999px', padding: '8px 16px', marginBottom: '1.25rem',
+        fontSize: '14px', color: '#6B6660', cursor: 'pointer',
+      }}
+    >
+      ← Torna indietro
+    </button>
       <nav className={styles.breadcrumb}>
         <Link to="/">Home</Link>
         <span>›</span>

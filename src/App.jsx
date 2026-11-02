@@ -23,6 +23,7 @@ import SpedizioniPage from './pages/SpedizioniPage'
 import FaqPage from './pages/FaqPage'
 import ContattiPage from './pages/ContattiPage'
 import ChiSiamoPage from './pages/ChiSiamoPage'
+import WelcomeModal from './components/WelcomeModal'
 
 const AdminPage = lazy(() => import('./pages/admin/AdminPage'))
 
@@ -84,6 +85,7 @@ function AppLayout() {
   const [cartOpen, setCartOpen] = useState(false)
   return (
     <>
+    <WelcomeModal />
       <Navbar onCartOpen={() => setCartOpen(true)} />
       <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
       <Routes>

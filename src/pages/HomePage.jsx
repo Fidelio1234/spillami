@@ -51,7 +51,7 @@ export default function HomePage() {
           </p>
           <div className={styles.heroActions}>
             <Link to="/shop" className="btn btn-dark">Scopri il catalogo</Link>
-            <Link to="/shop?cat=collezione" className="btn btn-outline">Collezioni speciali</Link>
+             {/* <Link to="/shop?cat=collezione" className="btn btn-outline">Collezioni speciali</Link>*/}
           </div>
         </div>
 
