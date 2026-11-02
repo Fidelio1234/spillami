@@ -14,7 +14,7 @@ export default function PrivacyPage() {
 
         <section className={styles.section}>
           <h2>2. Dati raccolti</h2>
-          <p>In fase di acquisto o registrazione raccogliamo: nome e cognome, indirizzo email, indirizzo di spedizione. I dati di pagamento sono gestiti direttamente da Stripe e non vengono conservati da Spillami.</p>
+          <p>In fase di acquisto o registrazione raccogliamo: nome e cognome, indirizzo email, indirizzo di spedizione. I dati di pagamento sono gestiti direttamente da Stripe e non vengono conservati da Smart-Shop.</p>
         </section>
 
         <section className={styles.section}>
