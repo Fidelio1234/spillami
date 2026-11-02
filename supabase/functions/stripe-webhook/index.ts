@@ -60,6 +60,18 @@ Deno.serve(async (req) => {
       console.error('DB error:', dbError)
     }
 
+    // Disattiva i prodotti venduti: spariscono dallo shop, restano in admin
+    try {
+      const soldItems = JSON.parse(session.metadata?.items ?? '[]')
+      const soldIds = soldItems.map((i: { id: string }) => i.id).filter(Boolean)
+      if (soldIds.length > 0) {
+        await supabase.from('products').update({ active: false }).in('id', soldIds)
+      }
+    } catch (err) {
+      console.error('Deactivate error:', err)
+    }
+
+
     // ── Costruisce e invia l'email al merchant ──────────────────
     const itemsHtml = lineItems.data
       .map(

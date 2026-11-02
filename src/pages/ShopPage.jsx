@@ -166,9 +166,7 @@ function ShopPage() {
                       : <span className={styles.cardEmoji}>{product.emoji || '📌'}</span>
                     }
                     {product.badge && <span className={styles.cardBadge}>{product.badge}</span>}
-                    {product.stock <= 5 && product.stock > 0 && (
-                      <span className={styles.stockWarning}>Solo {product.stock} rimast{product.stock === 1 ? 'a' : 'e'}</span>
-                    )}
+                   
                   </div>
                 </Link>
                 <div className={styles.cardBody}>

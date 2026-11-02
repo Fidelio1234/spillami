@@ -293,7 +293,7 @@ function ProductForm({ products, loading: productsLoading, refetch }) {
 
   const [productName, setProductName] = useState('')
   const [form, setForm] = useState({
-    name: '', description: '', price: '', category: '', stock: '',
+    name: '', description: '', price: '', category: '', stock: 999,
     badge: '', emoji: '📌', color: '#F0EAE0', active: true, tags: '',
   })
   const [images, setImages] = useState([])
@@ -365,7 +365,7 @@ function ProductForm({ products, loading: productsLoading, refetch }) {
         description: form.description.trim(),
         price: parseFloat(form.price),
         category: form.category,
-        stock: parseInt(form.stock),
+        stock: parseInt(form.stock) || 999,
         badge: form.badge.trim() || null,
         emoji: form.emoji.trim() || '📌',
         color: form.color,
@@ -413,11 +413,6 @@ function ProductForm({ products, loading: productsLoading, refetch }) {
                 <label className={styles.label}>Prezzo (€) *</label>
                 <input className={styles.input} type="number" step="0.01" min="0"
                   value={form.price} onChange={(e) => set('price', e.target.value)} required placeholder="12.90" />
-              </div>
-              <div className={styles.field}>
-                <label className={styles.label}>Quantità in stock *</label>
-                <input className={styles.input} type="number" min="0"
-                  value={form.stock} onChange={(e) => set('stock', e.target.value)} required placeholder="20" />
               </div>
             </div>
             <div className={styles.fieldRow}>

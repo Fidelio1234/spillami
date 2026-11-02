@@ -113,9 +113,7 @@ export default function ProductPage() {
 
           <div className={styles.priceRow}>
             <span className={styles.price}>{fmt(product.price)}</span>
-            {product.stock > 0 && product.stock <= 8 && (
-              <span className={styles.stockWarn}>⚠️ Solo {product.stock} disponibili</span>
-            )}
+           
             {product.stock === 0 && <span className={styles.outOfStock}>Esaurito</span>}
           </div>
 
