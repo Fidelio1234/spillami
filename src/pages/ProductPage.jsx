@@ -154,7 +154,7 @@ export default function ProductPage() {
             {product.stock === 0 && <span className={styles.outOfStock}>Esaurito</span>}
           </div>
 
-          <p className={styles.desc}>{product.description}</p>
+          <p className={styles.desc} style={{ whiteSpace: 'pre-line' }}>{product.description}</p>
 
           {product.tags?.length > 0 && (
             <div className={styles.tags}>
