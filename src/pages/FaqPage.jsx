@@ -2,10 +2,7 @@ import styles from './LegalPage.module.css'
 import { useState } from 'react'
 
 const faqs = [
-  {
-    q: 'I prodotti sono davvero fatti a mano?',
-    a: 'Sì, ogni spilla e accessorio è realizzato artigianalmente. Ogni pezzo è unico e potrebbe avere piccole variazioni rispetto alle foto.',
-  },
+ 
   {
     q: 'Quali metodi di pagamento accettate?',
     a: 'Accettiamo carte di credito e debito (Visa, Mastercard, American Express) tramite Stripe. I pagamenti sono sicuri e cifrati.',
